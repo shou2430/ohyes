@@ -51,11 +51,11 @@ Exceptions: Google sign-in button touch target minimum 44px height (accessibilit
 | Role | Size | Weight | Line Height | Usage |
 |------|------|--------|-------------|-------|
 | Body | 16px | 400 (regular) | 1.5 | Descriptions, empty state text |
-| Label | 14px | 500 (medium) | 1.4 | Navigation items, button text, metadata |
+| Label | 14px | 400 (regular) | 1.4 | Navigation items, button text, metadata |
 | Heading | 24px | 600 (semibold) | 1.2 | Page headings, dashboard title |
-| Display | 36px | 700 (bold) | 1.1 | Landing page app name |
+| Display | 36px | 600 (semibold) | 1.1 | Landing page app name |
 
-**Note:** Only 2 primary weights used (400, 600). Display at 700 is reserved exclusively for the app name on the landing page. Label at 500 is the medium fallback within Inter variable.
+**Note:** Exactly 2 weights used: 400 (body, labels) and 600 (headings, display). This keeps font file size minimal and visual hierarchy clean.
 
 ---
 
@@ -92,6 +92,8 @@ Exceptions: Google sign-in button touch target minimum 44px height (accessibilit
 | AppLogo | App name "OhYes" in Display typography + tagline "Say Yes to Connection" in Body | static |
 | GoogleSignInButton | "Sign in with Google" CTA, full-width on mobile, auto-width on desktop | default, hover (+scale 1.02), loading (spinner replaces icon), disabled |
 | LandingLayout | Centered flex container, vertically + horizontally centered, min-h-screen | static |
+
+**Primary focal point:** GoogleSignInButton + AppLogo cluster, centered viewport (horizontal and vertical center).
 
 **Landing page layout:**
 - Full viewport height, centered content
