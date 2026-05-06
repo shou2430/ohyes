@@ -2,18 +2,35 @@ import { createContext, useContext, useEffect, useState } from "react";
 
 const AuthContext = createContext(null);
 
+const TOKEN_KEY = "ohyes_token";
+
+function authHeaders() {
+  const token = localStorage.getItem(TOKEN_KEY);
+  if (!token) return {};
+  return { Authorization: `Bearer ${token}` };
+}
+
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function checkAuth() {
+      const token = localStorage.getItem(TOKEN_KEY);
+      if (!token) {
+        setLoading(false);
+        return;
+      }
+
       try {
-        const res = await fetch("/api/auth/me", { credentials: "same-origin" });
+        const res = await fetch("/api/auth/me", {
+          headers: authHeaders(),
+        });
         if (res.ok) {
           const data = await res.json();
           setUser(data);
         } else {
+          localStorage.removeItem(TOKEN_KEY);
           setUser(null);
         }
       } catch {
@@ -29,9 +46,10 @@ export function AuthProvider({ children }) {
     try {
       await fetch("/api/auth/logout", {
         method: "POST",
-        credentials: "same-origin",
+        headers: authHeaders(),
       });
     } finally {
+      localStorage.removeItem(TOKEN_KEY);
       setUser(null);
     }
   };
