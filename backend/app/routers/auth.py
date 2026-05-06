@@ -33,7 +33,7 @@ async def login(request: Request):
 
 @router.get("/callback")
 async def callback(request: Request, db: AsyncSession = Depends(get_db)):
-    """Handle Google OAuth callback, upsert user, redirect to frontend with JWT in query param."""
+    """Handle Google OAuth callback, upsert user, redirect with JWT."""
     token = await oauth.google.authorize_access_token(request)
     userinfo = token.get("userinfo")
     if not userinfo:
@@ -78,5 +78,5 @@ async def get_me(current_user: User = Depends(get_current_user)):
 
 @router.post("/logout")
 async def logout():
-    """Logout is client-side only (clear localStorage). This endpoint exists for future server-side token revocation."""
+    """Logout is client-side (clear localStorage). Exists for future revocation."""
     return {"message": "Logged out"}

@@ -31,7 +31,7 @@ async def get_current_user(
     credentials: HTTPAuthorizationCredentials = Depends(bearer_scheme),
     db: AsyncSession = Depends(get_db),
 ) -> User:
-    """FastAPI dependency that extracts and validates the JWT from the Authorization Bearer header."""
+    """Extract and validate JWT from the Authorization Bearer header."""
     token = credentials.credentials
 
     try:
