@@ -1,0 +1,20 @@
+{
+  "app": {
+    "name": "OhYes",
+    "tagline": "Say Yes to Connection"
+  },
+  "landing": {
+    "signIn": "Sign in with Google",
+    "signingIn": "Signing in..."
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "emptyHeading": "No invitations yet",
+    "emptyBody": "Create your first invitation and share it with someone special.",
+    "createButton": "Create Invitation",
+    "logOut": "Log out"
+  },
+  "errors": {
+    "signInFailed": "Sign-in failed. Please try again."
+  }
+}
