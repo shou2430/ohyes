@@ -17,9 +17,9 @@ Requirements in scope: AUTH-01, AUTH-02, AUTH-03, INFR-01, INFR-02
 
 ### OAuth Flow & Session
 - **D-01:** Google OAuth uses redirect flow (server-side via Authlib). User clicks "Sign in with Google" → redirected to Google → redirected back to app with auth code → backend exchanges for tokens.
-- **D-02:** JWT session token stored as httpOnly cookie (SameSite=Lax). Frontend never touches the token directly — backend sets/reads it.
-- **D-03:** JWT has 24h TTL with no refresh token. When expired, user re-authenticates with Google (one-click). Simple, sufficient for a casual app.
-- **D-04:** Backend generates its own JWT after validating Google's OAuth response. The JWT contains the user's internal ID and is signed with JWT_SECRET.
+- **D-02:** JWT session token returned in OAuth callback response body. Frontend stores in localStorage and sends via `Authorization: Bearer <token>` header on every API request. *(Updated from httpOnly cookie: eliminates need for reverse proxy to solve Railway's Public Suffix List cookie domain issue. XSS risk acceptable — app has no user-generated HTML content.)*
+- **D-03:** JWT has 24h TTL with no refresh token. When expired, user re-authenticates with Google (one-click). Simple, sufficient for a casual app. Frontend must handle 401 responses by clearing localStorage and redirecting to landing page.
+- **D-04:** Backend generates its own JWT after validating Google's OAuth response. The JWT contains the user's internal ID and is signed with JWT_SECRET. Backend validates the Bearer token via a FastAPI dependency.
 
 ### User Data
 - **D-05:** (Claude's Discretion) Store minimal user data from Google OAuth. At minimum: Google ID (unique identifier), email, display name. May include Google profile photo URL if it adds value to the dashboard header with minimal effort.
@@ -42,8 +42,8 @@ Requirements in scope: AUTH-01, AUTH-02, AUTH-03, INFR-01, INFR-02
 - **D-14:** Auto-deploy on push to main branch. Railway watches the GitHub repo.
 - **D-15:** Deploy a working skeleton to Railway at the end of Phase 1. Proves full stack: frontend serves, backend responds, DB connects, OAuth redirects work.
 - **D-16:** Use Railway's default domain for v1 (e.g., *.up.railway.app). Custom domain deferred.
-- **D-17:** Frontend served via Nginx container (Vite build output → Nginx static serving). Backend runs as Docker container with FastAPI + Uvicorn.
-- **D-18:** Railway services: Frontend (Nginx), Backend (FastAPI), Database (PostgreSQL plugin). Persistent volume attached to backend for future photo storage.
+- **D-17:** Frontend deployed as Railway static site (Vite build output served directly by Railway). Backend runs as Docker container with FastAPI + Uvicorn. No reverse proxy needed — frontend calls backend API directly via separate domain with CORS. *(Updated from Caddy: Bearer token eliminates cookie domain issue, so reverse proxy is unnecessary.)*
+- **D-18:** Railway services: Frontend (static site), Backend (FastAPI + Docker), Database (PostgreSQL plugin). Persistent volume attached to backend for future photo storage. CORS configured on backend to allow frontend origin.
 
 ### Claude's Discretion
 - User data scope (D-05): Minimal set, may include Google avatar URL
