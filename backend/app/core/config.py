@@ -23,9 +23,7 @@ class Settings(BaseSettings):
     @property
     def async_database_url(self) -> str:
         """Convert postgresql:// to postgresql+asyncpg:// for async driver."""
-        return self.DATABASE_URL.replace(
-            "postgresql://", "postgresql+asyncpg://", 1
-        )
+        return self.DATABASE_URL.replace("postgresql://", "postgresql+asyncpg://", 1)
 
     model_config = {"env_file": ".env", "extra": "ignore"}
 
