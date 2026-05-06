@@ -1,5 +1,6 @@
 from urllib.parse import urlencode
 
+from authlib.integrations.base_client.errors import OAuthError
 from authlib.integrations.starlette_client import OAuth
 from fastapi import APIRouter, Depends, Request
 from fastapi.responses import RedirectResponse
@@ -34,7 +35,12 @@ async def login(request: Request):
 @router.get("/callback")
 async def callback(request: Request, db: AsyncSession = Depends(get_db)):
     """Handle Google OAuth callback, upsert user, redirect with JWT."""
-    token = await oauth.google.authorize_access_token(request)
+    try:
+        token = await oauth.google.authorize_access_token(request)
+    except OAuthError as e:
+        error_params = urlencode({"error": "auth_failed", "detail": str(e)})
+        return RedirectResponse(url=f"{settings.FRONTEND_URL}/?{error_params}")
+
     userinfo = token.get("userinfo")
     if not userinfo:
         return RedirectResponse(url=f"{settings.FRONTEND_URL}/?error=auth_failed")
