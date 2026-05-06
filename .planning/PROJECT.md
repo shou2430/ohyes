@@ -12,11 +12,9 @@ The moment of delight when someone sees a personalized page made just for them a
 
 ### Validated
 
-(None yet — ship to validate)
+- [x] Google OAuth login for creators — Validated in Phase 01: Foundation & Authentication
 
 ### Active
-
-- [ ] Google OAuth login for creators
 - [ ] Creator dashboard to manage invitations (max 2 active)
 - [ ] Create invitation: custom title, photo upload, set 4-8 character password for recipient
 - [ ] Each invitation generates a unique shareable URL (with unique ID)
@@ -57,7 +55,7 @@ The moment of delight when someone sees a personalized page made just for them a
 
 | Decision | Rationale | Outcome |
 |----------|-----------|---------|
-| Google OAuth for auth | Low friction, no password management needed for a casual app | — Pending |
+| Google OAuth for auth | Low friction, no password management needed for a casual app | ✓ Validated (Phase 01) |
 | PostgreSQL over MongoDB | Structured data, clear relations, better for expiry queries and Railway support | — Pending |
 | Railway volume for photos | Simplest option, avoids external service dependency for v1 | — Pending |
 | Bilingual (zh-TW + en) | Broaden audience, default Traditional Chinese with toggle | — Pending |
@@ -83,4 +81,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-05-04 after initialization*
+*Last updated: 2026-05-06 after Phase 01 completion*
