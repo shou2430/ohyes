@@ -27,6 +27,10 @@
 **UI hint:** yes — creator dashboard and invitation creation form
 **Depends on:** Phase 1
 
+**Plans:**
+- [x] Plan 01: Backend — Invitation Model, Photo Pipeline, and API Endpoints (2026-05-09)
+- [ ] Plan 02: Frontend — Creation Form, Dashboard Cards, and Recipient Gate
+
 **Success Criteria:**
 1. User can create an invitation with a custom title, uploaded photo, and 4-8 character password and receive a unique shareable URL
 2. User sees their active invitations listed on the dashboard and can delete any of them
