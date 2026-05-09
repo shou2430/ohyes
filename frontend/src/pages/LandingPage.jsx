@@ -35,7 +35,7 @@ export default function LandingPage() {
             triggering a full-page redirect (server-side OAuth flow), there's no async gap to show
             a spinner. The browser's native navigation indicator serves this purpose. */}
         <a
-          href="/api/auth/login"
+          href={`${import.meta.env.VITE_API_URL}/api/auth/login`}
           className="flex h-11 w-full items-center justify-center gap-2 rounded-lg bg-accent text-sm font-medium text-white transition-transform hover:scale-[1.02] sm:w-auto sm:min-w-[200px] sm:px-6"
         >
           <LogIn size={18} />

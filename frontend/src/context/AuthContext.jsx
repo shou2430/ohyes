@@ -3,6 +3,7 @@ import { createContext, useContext, useEffect, useState } from "react";
 const AuthContext = createContext(null);
 
 const TOKEN_KEY = "ohyes_token";
+const API_URL = import.meta.env.VITE_API_URL || "";
 
 function authHeaders() {
   const token = localStorage.getItem(TOKEN_KEY);
@@ -23,7 +24,7 @@ export function AuthProvider({ children }) {
       }
 
       try {
-        const res = await fetch("/api/auth/me", {
+        const res = await fetch(`${API_URL}/api/auth/me`, {
           headers: authHeaders(),
         });
         if (res.ok) {
@@ -44,7 +45,7 @@ export function AuthProvider({ children }) {
 
   const logout = async () => {
     try {
-      await fetch("/api/auth/logout", {
+      await fetch(`${API_URL}/api/auth/logout`, {
         method: "POST",
         headers: authHeaders(),
       });
