@@ -15,5 +15,5 @@ COPY . .
 # Create photo storage directory (Railway volume will mount over this)
 RUN mkdir -p /data/photos
 
-# Run with shell form to expand $PORT
-CMD uv run uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8000}
+# Run migrations then start server
+CMD uv run alembic upgrade head && uv run uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8000}
