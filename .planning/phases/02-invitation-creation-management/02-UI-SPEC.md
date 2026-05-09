@@ -51,10 +51,6 @@ Exceptions: Touch targets on mobile must be minimum 44px height (h-11 class, alr
 | Base | 16px | 400 (regular) | 1.5 | `text-base` |
 | Heading | 20px | 600 (semibold) | 1.2 | `text-xl font-semibold` |
 | Display | 24px | 600 (semibold) | 1.2 | `text-2xl font-semibold` |
-| Caption | 12px | 400 (regular) | 1.4 | `text-xs` |
-
-Caption is a sub-scale utility size used for inline hints, character counters, and format notes (e.g., photo format hint, password helper text, character counter). Not a primary typographic role — used only for supplementary information adjacent to form fields.
-
 Source: Inherited from Phase 1 patterns. Landing uses `text-4xl font-semibold` for app title, dashboard uses `text-2xl font-semibold` for headings, `text-base` for body, `text-sm` for labels and buttons.
 
 ---
@@ -127,7 +123,7 @@ Source: All values from existing `index.css` `@theme` block.
 
 **Photo upload:**
 - Label: `text-sm font-medium text-text-primary mb-2` — "Photo"
-- Upload area (no photo selected): Dashed border rectangle, `h-40 w-full rounded-lg border-2 border-dashed border-border flex items-center justify-center cursor-pointer hover:border-accent hover:bg-cream/50 transition-colors`. Interior: Lucide `ImagePlus` icon (32px, `text-text-secondary`) above `text-sm text-text-secondary` "Click to upload a photo". Below that: `text-xs text-text-secondary` "JPG, PNG, or WebP. Max 5 MB."
+- Upload area (no photo selected): Dashed border rectangle, `h-40 w-full rounded-lg border-2 border-dashed border-border flex items-center justify-center cursor-pointer hover:border-accent hover:bg-cream/50 transition-colors`. Interior: Lucide `ImagePlus` icon (32px, `text-text-secondary`) above `text-sm text-text-secondary` "Click to upload a photo". Below that: `text-sm text-text-secondary` "JPG, PNG, or WebP. Max 5 MB."
 - Upload area (photo selected): Replace dashed area with image preview. `h-40 w-full rounded-lg object-cover`. Overlay on hover: semi-transparent dark overlay with "Change photo" text and Lucide `RefreshCw` icon. Click to re-open file picker.
 - Hidden `<input type="file" accept="image/*">` triggered by click on upload area.
 - Error: "File too large. Maximum size is 5 MB." in `text-sm text-destructive mt-1`.
@@ -135,9 +131,9 @@ Source: All values from existing `index.css` `@theme` block.
 **Password field:**
 - Label: `text-sm font-medium text-text-primary mb-2` — "Password"
 - Input: Same styling as title input. `type="text"` by default (visible, per D-16). Toggle button inside input (right side): Lucide `EyeOff`/`Eye` icon (16px), `text-text-secondary hover:text-text-primary`.
-- Character counter: Right-aligned below input. `text-xs text-text-secondary`. Format: "N/8 characters". Turns `text-destructive` when count < 4 or > 8 after user has started typing.
+- Character counter: Right-aligned below input. `text-sm text-text-secondary`. Format: "N/8 characters". Turns `text-destructive` when count < 4 or > 8 after user has started typing.
 - Placeholder: "Set a password for your recipient"
-- Helper text: `text-xs text-text-secondary mt-1` — "4-8 characters. This is a personal touch, not a security feature."
+- Helper text: `text-sm text-text-secondary mt-1` — "4-8 characters. This is a personal touch, not a security feature."
 - Error: "Password must be 4-8 characters" in `text-sm text-destructive mt-1`.
 
 **Submit button:**
@@ -311,7 +307,7 @@ No shadcn or third-party component registries. All components are hand-rolled wi
 - [x] Dimension 1 Copywriting: PASS
 - [x] Dimension 2 Visuals: PASS — focal points declared for Dashboard and Create Form
 - [x] Dimension 3 Color: PASS
-- [x] Dimension 4 Typography: PASS — Caption (text-xs, 12px) added as sub-scale utility
+- [x] Dimension 4 Typography: PASS — 4 sizes only (14/16/20/24px), Caption (12px) removed
 - [x] Dimension 5 Spacing: PASS — mb-1.5 (6px) replaced with mb-2 (8px) across all labels
 - [x] Dimension 6 Registry Safety: PASS
 
