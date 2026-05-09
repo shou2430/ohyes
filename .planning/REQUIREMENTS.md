@@ -9,9 +9,9 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Authentication
 
-- [ ] **AUTH-01**: User can log in with Google OAuth (one-click)
-- [ ] **AUTH-02**: User session persists via JWT (24h TTL)
-- [ ] **AUTH-03**: User can log out from dashboard
+- [x] **AUTH-01**: User can log in with Google OAuth (one-click)
+- [x] **AUTH-02**: User session persists via JWT (24h TTL)
+- [x] **AUTH-03**: User can log out from dashboard
 
 ### Invitation
 
@@ -48,8 +48,8 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Infrastructure
 
-- [ ] **INFR-01**: Deployed on Railway (FastAPI + React + PostgreSQL)
-- [ ] **INFR-02**: Photos stored on Railway persistent volume
+- [x] **INFR-01**: Deployed on Railway (FastAPI + React + PostgreSQL)
+- [x] **INFR-02**: Photos stored on Railway persistent volume
 
 ## v2 Requirements
 
@@ -91,9 +91,9 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| AUTH-01 | Phase 1 | Pending |
-| AUTH-02 | Phase 1 | Pending |
-| AUTH-03 | Phase 1 | Pending |
+| AUTH-01 | Phase 1 | Complete |
+| AUTH-02 | Phase 1 | Complete |
+| AUTH-03 | Phase 1 | Complete |
 | INV-01 | Phase 2 | Pending |
 | INV-02 | Phase 2 | Pending |
 | INV-03 | Phase 2 | Pending |
@@ -115,8 +115,8 @@ Which phases cover which requirements. Updated during roadmap creation.
 | UI-01 | Phase 5 | Pending |
 | UI-02 | Phase 5 | Pending |
 | UI-03 | Phase 5 | Pending |
-| INFR-01 | Phase 1 | Pending |
-| INFR-02 | Phase 1 | Pending |
+| INFR-01 | Phase 1 | Complete |
+| INFR-02 | Phase 1 | Complete |
 
 **Coverage:**
 - v1 requirements: 26 total
