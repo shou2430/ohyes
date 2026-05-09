@@ -116,9 +116,17 @@ export default function CreateInvitationPage() {
         const data = await res.json();
         setSuccessShareUrl(data.share_url);
       } else {
-        setToast(t("errors.network"));
+        // Show server error message when available (e.g. 409 limit reached,
+        // 400 validation errors), fall back to generic for unparseable responses.
+        try {
+          const errorData = await res.json();
+          setToast(errorData.detail || t("errors.network"));
+        } catch {
+          setToast(t("errors.network"));
+        }
       }
     } catch {
+      // True network failure (no response received)
       setToast(t("errors.network"));
     } finally {
       setSubmitting(false);
