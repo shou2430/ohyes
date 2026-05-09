@@ -19,7 +19,9 @@ export default function DashboardPage() {
   const [toast, setToast] = useState(null);
 
   // Set page title per UI spec
-  document.title = "Dashboard - OhYes";
+  useEffect(() => {
+    document.title = "Dashboard - OhYes";
+  }, []);
 
   // Fetch invitations on mount
   useEffect(() => {
