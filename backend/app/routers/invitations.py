@@ -25,7 +25,7 @@ router = APIRouter(prefix="/api/invitations", tags=["invitations"])
 
 ALPHABET = string.ascii_letters + string.digits
 CODE_LENGTH = 7
-INVITATION_TTL_DAYS = 7
+INVITATION_TTL_MINUTES = 1  # TODO: change back to 7 days after testing
 MAX_ACTIVE_INVITATIONS = 2
 PHOTO_FILENAME_PATTERN = re.compile(r"^[A-Za-z0-9]{7}\.webp$")
 
@@ -105,7 +105,7 @@ async def create_invitation(
     # Generate short code and create invitation
     short_code = await create_unique_short_code(db)
     photo_filename = f"{short_code}.webp"
-    expires_at = now + timedelta(days=INVITATION_TTL_DAYS)
+    expires_at = now + timedelta(minutes=INVITATION_TTL_MINUTES)
 
     invitation = Invitation(
         user_id=current_user.id,
