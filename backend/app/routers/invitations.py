@@ -131,6 +131,7 @@ async def create_invitation(
             detail="Photo storage failed. Please try again.",
         )
 
+    await db.commit()
     return build_invitation_response(invitation)
 
 
@@ -179,6 +180,7 @@ async def delete_invitation(
         os.remove(photo_path)
 
     await db.delete(invitation)
+    await db.commit()
     return InvitationDeleteResponse(message="Invitation deleted")
 
 
