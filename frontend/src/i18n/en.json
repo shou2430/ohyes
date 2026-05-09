@@ -12,9 +12,46 @@
     "emptyHeading": "No invitations yet",
     "emptyBody": "Create your first invitation and share it with someone special.",
     "createButton": "Create Invitation",
-    "logOut": "Log out"
+    "logOut": "Log out",
+    "limitReached": "You've reached the limit of 2 active invitations. Delete one to create a new one.",
+    "deleteConfirm": "Delete this invitation? This cannot be undone.",
+    "delete": "Delete",
+    "copyLink": "Copy link",
+    "copied": "Copied!",
+    "passwordLabel": "Password:",
+    "daysRemaining": "{{count}} days remaining"
+  },
+  "create": {
+    "submit": "Create Invitation",
+    "submitting": "Creating...",
+    "successHeading": "Invitation Created!",
+    "successBody": "Share this link with your special someone.",
+    "copyLink": "Copy Link",
+    "backToDashboard": "Back to Dashboard",
+    "titleLabel": "Title",
+    "titlePlaceholder": "Will you...?",
+    "photoLabel": "Photo",
+    "photoPlaceholder": "Click to upload a photo",
+    "photoHint": "JPG, PNG, or WebP. Max 5 MB.",
+    "changePhoto": "Change photo",
+    "photoTooLarge": "File too large. Maximum size is 5 MB.",
+    "passwordLabel": "Password",
+    "passwordPlaceholder": "Set a password for your recipient",
+    "passwordHint": "4-8 characters. This is a personal touch, not a security feature.",
+    "passwordError": "Password must be 4-8 characters",
+    "titleRequired": "Title is required",
+    "photoRequired": "Photo is required",
+    "back": "Back to Dashboard",
+    "preview": "Preview",
+    "previewTitlePlaceholder": "Your title here"
+  },
+  "invitation": {
+    "expiredHeading": "This invitation has expired",
+    "expiredBody": "This invitation has expired or been removed.",
+    "goHome": "Go to OhYes"
   },
   "errors": {
-    "signInFailed": "Sign-in failed. Please try again."
+    "signInFailed": "Sign-in failed. Please try again.",
+    "network": "Something went wrong. Please try again."
   }
 }
