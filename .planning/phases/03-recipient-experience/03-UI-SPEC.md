@@ -1,7 +1,7 @@
 ---
 phase: 3
 slug: recipient-experience
-status: draft
+status: approved
 shadcn_initialized: false
 preset: none
 created: 2026-05-09
@@ -164,7 +164,7 @@ Source: All base values from existing `index.css` `@theme` block. Sparkle gold a
   - Stamp text: `mt-3 text-sm text-text-secondary`. Text: "Sealed with a Yes".
 
 #### Below Postcard
-- **Download button (if feasible):** `mt-6 h-11 px-6 rounded-lg border border-border text-sm font-medium text-text-primary hover:bg-stone-50 transition-colors inline-flex items-center gap-2`. Lucide `Download` icon (16px). Label: "Save as image". Uses `html2canvas` to capture the postcard element. If `html2canvas` integration proves too complex, omit this button entirely.
+- **Download button (if feasible):** `mt-6 h-11 px-6 rounded-lg border border-border text-sm font-semibold text-text-primary hover:bg-stone-50 transition-colors inline-flex items-center gap-2`. Lucide `Download` icon (16px). Label: "Save as image". Uses `html2canvas` to capture the postcard element. If `html2canvas` integration proves too complex, omit this button entirely.
 - **Close text:** `mt-4 text-sm text-text-secondary`. Text: "This page will close automatically." (Non-functional in v1 — informational only.)
 
 ---
@@ -406,11 +406,11 @@ No shadcn or third-party component registries. All components are hand-rolled wi
 
 ## Checker Sign-Off
 
-- [ ] Dimension 1 Copywriting: PASS
-- [ ] Dimension 2 Visuals: PASS
-- [ ] Dimension 3 Color: PASS
-- [ ] Dimension 4 Typography: PASS
-- [ ] Dimension 5 Spacing: PASS
-- [ ] Dimension 6 Registry Safety: PASS
+- [x] Dimension 1 Copywriting: PASS
+- [x] Dimension 2 Visuals: PASS
+- [x] Dimension 3 Color: PASS
+- [x] Dimension 4 Typography: PASS
+- [x] Dimension 5 Spacing: PASS
+- [x] Dimension 6 Registry Safety: PASS (not applicable)
 
-**Approval:** pending
+**Approval:** approved 2026-05-09
