@@ -4,6 +4,8 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import LandingPage from "./pages/LandingPage";
 import DashboardPage from "./pages/DashboardPage";
 import AuthCallbackPage from "./pages/AuthCallbackPage";
+import CreateInvitationPage from "./pages/CreateInvitationPage";
+import InvitationGatePage from "./pages/InvitationGatePage";
 
 export default function App() {
   return (
@@ -20,6 +22,15 @@ export default function App() {
               </ProtectedRoute>
             }
           />
+          <Route
+            path="/create"
+            element={
+              <ProtectedRoute>
+                <CreateInvitationPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route path="/i/:code" element={<InvitationGatePage />} />
         </Routes>
       </AuthProvider>
     </BrowserRouter>
