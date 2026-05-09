@@ -13,11 +13,11 @@ The moment of delight when someone sees a personalized page made just for them a
 ### Validated
 
 - [x] Google OAuth login for creators — Validated in Phase 01: Foundation & Authentication
+- [x] Creator dashboard to manage invitations (max 2 active) — Validated in Phase 02: Invitation Creation & Management
+- [x] Create invitation: custom title, photo upload, set 4-8 character password for recipient — Validated in Phase 02: Invitation Creation & Management
+- [x] Each invitation generates a unique shareable URL (with unique ID) — Validated in Phase 02: Invitation Creation & Management
 
 ### Active
-- [ ] Creator dashboard to manage invitations (max 2 active)
-- [ ] Create invitation: custom title, photo upload, set 4-8 character password for recipient
-- [ ] Each invitation generates a unique shareable URL (with unique ID)
 - [ ] Recipient enters password to unlock the personalized page
 - [ ] Personalized page displays: title, photo, Yes button, and a "No" button that increasingly frantically dodges the cursor
 - [ ] Clicking "Yes" triggers a 30-character message dialog for the recipient
@@ -81,4 +81,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-05-06 after Phase 01 completion*
+*Last updated: 2026-05-09 after Phase 02 completion*
