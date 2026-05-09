@@ -69,13 +69,15 @@ async def create_invitation(
     db: AsyncSession = Depends(get_db),
 ):
     """Create a new invitation with title, password, and photo."""
-    # Check active invitation count
+    # Check active invitation count with row-level lock to prevent TOCTOU race.
+    # Without FOR UPDATE, two concurrent requests could both pass the count check
+    # and create a 3rd invitation, bypassing the MAX_ACTIVE_INVITATIONS limit.
     now = datetime.now(timezone.utc)
     count_result = await db.execute(
         select(func.count()).select_from(Invitation).where(
             Invitation.user_id == current_user.id,
             Invitation.expires_at > now,
-        )
+        ).with_for_update()
     )
     active_count = count_result.scalar()
     if active_count >= MAX_ACTIVE_INVITATIONS:
