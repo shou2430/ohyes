@@ -52,10 +52,10 @@ Exceptions: Touch targets on mobile must be minimum 44px height (h-11). The No b
 | Base | 16px | 400 (regular) | 1.5 | `text-base` |
 | Heading | 20px | 600 (semibold) | 1.2 | `text-xl font-semibold` |
 | Display | 24px | 600 (semibold) | 1.2 | `text-2xl font-semibold` |
-| Title Display | 32px | 700 (bold) | 1.1 | `text-3xl font-bold` |
-| Counter | 14px | 600 (semibold) | 1.0 | `text-sm font-semibold` |
 
-Source: Inherited from Phase 2. Title Display (32px) added for the invitation title on the reveal page. Counter (14px semibold) added for the dodge counter badge.
+4 sizes, 2 weights. Body (14px) is reused for counter badge and labels with `font-semibold` weight variant — not a separate typographic role. Title Display removed — invitation title on reveal page uses Display (24px semibold) instead. Postcard title uses Heading (20px semibold).
+
+Source: Inherited from Phase 2. Consolidated to stay within 4-size, 2-weight budget.
 
 ---
 
@@ -98,7 +98,7 @@ Source: All base values from existing `index.css` `@theme` block. Sparkle gold a
 1. **Invitation title:** `text-2xl font-semibold text-text-primary`. Displays the creator's custom title text. Max 2 lines, `line-clamp-2`.
 2. **Instruction text:** `text-base text-text-secondary mt-3` — "Enter the password to continue"
 3. **Password input:** `mt-6 h-11 w-full rounded-lg border border-border px-4 text-base text-text-primary text-center tracking-widest placeholder:text-text-secondary placeholder:tracking-normal focus:border-accent focus:ring-1 focus:ring-accent outline-none transition-colors`. `type="password"`. Placeholder: "Password".
-4. **Submit button:** `mt-4 h-11 w-full rounded-lg bg-accent text-sm font-medium text-white hover:scale-[1.02] transition-transform`. Label: "Unlock". Disabled state: `opacity-50 cursor-not-allowed` when input is empty.
+4. **Submit button:** `mt-4 h-11 w-full rounded-lg bg-accent text-sm font-semibold text-white hover:scale-[1.02] transition-transform`. Label: "Unlock". Disabled state: `opacity-50 cursor-not-allowed` when input is empty.
 5. **Error state:** On wrong password, the input field receives: `border-destructive focus:border-destructive focus:ring-destructive` + shake animation (see Interaction Contracts). Error text appears below input: `text-sm text-destructive mt-2` — "Incorrect password".
 
 ### Screen 2: Invitation Reveal (after correct password)
@@ -111,7 +111,7 @@ Source: All base values from existing `index.css` `@theme` block. Sparkle gold a
 - Vertical stack, centered alignment.
 
 #### Elements (top to bottom)
-1. **Title:** `text-3xl font-bold text-text-primary text-center`. The creator's custom title. Max 2 lines, `line-clamp-2`.
+1. **Title:** `text-2xl font-semibold text-text-primary text-center`. The creator's custom title. Max 2 lines, `line-clamp-2`.
 2. **Photo:** `mt-6 w-full rounded-xl object-cover aspect-[4/3] shadow-md`. Loaded from backend photo endpoint. Placeholder: cream rectangle with LoadingSpinner while loading.
 3. **Button row:** `mt-8 flex items-center justify-center gap-4`.
    - **Yes button:** `h-12 px-8 rounded-xl bg-accent text-base font-semibold text-white shadow-sm hover:scale-[1.03] active:scale-[0.98] transition-transform`. Label: "Yes!"
@@ -144,7 +144,7 @@ Source: All base values from existing `index.css` `@theme` block. Sparkle gold a
    - Label: `text-sm font-medium text-text-primary mb-2` — "Message"
    - Input: `h-11 w-full rounded-lg border border-border px-3 text-base text-text-primary placeholder:text-text-secondary focus:border-accent focus:ring-1 focus:ring-accent outline-none transition-colors`. Placeholder: "Say something nice...". `maxLength={30}`.
    - Character counter: Right-aligned below input. `text-sm text-text-secondary mt-1 text-right`. Format: "N/30".
-5. **Send button:** `mt-6 h-11 w-full rounded-lg bg-accent text-sm font-medium text-white hover:scale-[1.02] transition-transform`. Label: "Send". Loading state: "Sending..." with button disabled.
+5. **Send button:** `mt-6 h-11 w-full rounded-lg bg-accent text-sm font-semibold text-white hover:scale-[1.02] transition-transform`. Label: "Send". Loading state: "Sending..." with button disabled.
 6. **Skip option:** `mt-3 text-sm text-text-secondary text-center cursor-pointer hover:text-text-primary`. Text: "Skip message". Submits with empty name/message.
 
 ### Screen 4: Postcard Keepsake (final screen)
@@ -345,7 +345,8 @@ transition: { duration: 0.1 }
 | No button (stage 5, cycle 2) | Please?? | 拜託？？ | `recipient.noPlease` |
 | No button (stage 5, cycle 3) | I give up | 我放棄了 | `recipient.noGiveUp` |
 | No button (stage 5, cycle 4) | Fine... | 好吧... | `recipient.noFine` |
-| Dodge counter (1-5) | dodge | 次閃避 | `recipient.dodge` |
+| Dodge counter (1) | dodge | 次閃避 | `recipient.dodge_one` |
+| Dodge counter (2-5) | dodges | 次閃避 | `recipient.dodge_other` |
 | Dodge counter (6-9) | dodges! | 次閃避！ | `recipient.dodgesExcited` |
 | Dodge counter (10-14) | They really can't say no | 真的無法拒絕呢 | `recipient.dodgesCantSayNo` |
 | Dodge counter (15+) | Unstoppable! | 勢不可擋！ | `recipient.dodgesUnstoppable` |
