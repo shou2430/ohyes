@@ -174,13 +174,16 @@ async def delete_invitation(
     if not invitation:
         raise HTTPException(status_code=404, detail="Invitation not found")
 
-    # Remove photo file from disk
+    # Delete DB row first, then remove photo file. If DB delete fails, the photo
+    # stays intact. An orphaned photo file (no DB row) is less severe than an
+    # orphaned DB row pointing to a missing file.
     photo_path = Path(settings.PHOTO_STORAGE_PATH) / invitation.photo_filename
+    await db.delete(invitation)
+    await db.commit()
+
     if photo_path.exists():
         os.remove(photo_path)
 
-    await db.delete(invitation)
-    await db.commit()
     return InvitationDeleteResponse(message="Invitation deleted")
 
 
