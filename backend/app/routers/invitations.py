@@ -14,10 +14,13 @@ from app.core.config import settings
 from app.core.database import get_db
 from app.core.security import get_current_user
 from app.models.invitation import Invitation
+from app.models.notification import Notification
 from app.models.user import User
 from app.schemas.invitation import (
     InvitationDeleteResponse,
     InvitationPublicResponse,
+    InvitationRespondRequest,
+    InvitationRespondResponse,
     InvitationResponse,
     InvitationRevealResponse,
     PasswordVerifyRequest,
@@ -241,3 +244,43 @@ async def verify_invitation_password(
         title=invitation.title,
         photo_url=photo_url,
     )
+
+
+@router.post("/by-code/{short_code}/respond", response_model=InvitationRespondResponse)
+async def respond_to_invitation(
+    short_code: str,
+    body: InvitationRespondRequest,
+    db: AsyncSession = Depends(get_db),
+):
+    """Public endpoint: recipient says Yes. Creates notification, deletes invitation and photo."""
+    now = datetime.now(timezone.utc)
+    result = await db.execute(
+        select(Invitation).where(
+            Invitation.short_code == short_code,
+            Invitation.expires_at > now,
+        )
+    )
+    invitation = result.scalar_one_or_none()
+    if not invitation:
+        raise HTTPException(status_code=404, detail="Invitation not found or expired")
+
+    # Snapshot data needed for notification before deleting invitation
+    notification = Notification(
+        user_id=invitation.user_id,
+        invitation_title=invitation.title,
+        recipient_name=body.name,
+        recipient_message=body.message,
+    )
+    db.add(notification)
+
+    # Delete invitation row
+    photo_filename = invitation.photo_filename
+    await db.delete(invitation)
+    await db.commit()
+
+    # Delete photo file after successful commit (same pattern as delete_invitation)
+    photo_path = Path(settings.PHOTO_STORAGE_PATH) / photo_filename
+    if photo_path.exists():
+        os.remove(photo_path)
+
+    return InvitationRespondResponse(message="Response recorded")
