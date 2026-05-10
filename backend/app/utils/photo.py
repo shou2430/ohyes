@@ -1,6 +1,6 @@
 import io
 
-from PIL import Image
+from PIL import Image, ImageOps
 
 MAX_DIMENSION = 1200
 WEBP_QUALITY = 85
@@ -26,6 +26,9 @@ def process_photo(file_contents: bytes) -> bytes:
 
     # Re-open after verify (verify() consumes the image)
     img = Image.open(io.BytesIO(file_contents))
+
+    # Apply EXIF orientation (phones store portrait photos as landscape + rotation tag)
+    img = ImageOps.exif_transpose(img)
 
     # Convert palette and RGBA modes to RGB
     if img.mode in ("RGBA", "P", "LA"):
