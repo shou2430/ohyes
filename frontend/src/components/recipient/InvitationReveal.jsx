@@ -16,6 +16,7 @@ export default function InvitationReveal({ invitation, onYesClick }) {
   const [dodgeCount, setDodgeCount] = useState(0);
   const [particles, setParticles] = useState([]);
   const [photoLoaded, setPhotoLoaded] = useState(false);
+  const [photoError, setPhotoError] = useState(false);
 
   const handleDodge = useCallback(
     ({ oldX, oldY, newX, newY, stageIndex }) => {
@@ -56,19 +57,25 @@ export default function InvitationReveal({ invitation, onYesClick }) {
           </h1>
 
           {/* Photo */}
-          <div className="mt-6 w-full rounded-xl overflow-hidden shadow-md aspect-[4/3] bg-cream">
-            {!photoLoaded && (
-              <div className="flex items-center justify-center w-full h-full">
+          <div className="mt-6 w-full rounded-xl overflow-hidden shadow-md aspect-[4/3] bg-cream relative">
+            {!photoLoaded && !photoError && (
+              <div className="absolute inset-0 flex items-center justify-center">
                 <LoadingSpinner />
+              </div>
+            )}
+            {photoError && (
+              <div className="absolute inset-0 flex items-center justify-center text-text-secondary text-sm">
+                ❌
               </div>
             )}
             <img
               src={`${API_URL}${invitation.photo_url}`}
               alt={invitation.title}
-              className={`w-full rounded-xl object-cover aspect-[4/3] shadow-md ${
-                photoLoaded ? "" : "hidden"
-              }`}
+              className={`w-full object-cover aspect-[4/3] ${
+                photoLoaded ? "opacity-100" : "opacity-0"
+              } transition-opacity`}
               onLoad={() => setPhotoLoaded(true)}
+              onError={() => setPhotoError(true)}
             />
           </div>
 

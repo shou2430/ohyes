@@ -195,7 +195,7 @@ export default function NoButton({ onDodge, dodgeCount, containerRef }) {
   return (
     <motion.button
       ref={buttonRef}
-      className="h-12 px-8 rounded-xl bg-white border border-border text-base font-semibold text-text-primary shadow-sm transition-all absolute z-10"
+      className="h-12 px-8 rounded-xl bg-white border border-border text-base font-semibold text-text-primary shadow-sm transition-all fixed z-10"
       animate={{
         left: pos.x,
         top: pos.y,
