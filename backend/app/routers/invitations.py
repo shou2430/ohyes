@@ -259,11 +259,14 @@ async def respond_to_invitation(
         select(Invitation).where(
             Invitation.short_code == short_code,
             Invitation.expires_at > now,
-        )
+        ).with_for_update()
     )
     invitation = result.scalar_one_or_none()
     if not invitation:
         raise HTTPException(status_code=404, detail="Invitation not found or expired")
+
+    if not hmac.compare_digest(invitation.password, body.password):
+        raise HTTPException(status_code=401, detail="Incorrect password")
 
     # Snapshot data needed for notification before deleting invitation
     notification = Notification(

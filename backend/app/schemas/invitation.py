@@ -41,6 +41,7 @@ class InvitationRevealResponse(BaseModel):
 
 
 class InvitationRespondRequest(BaseModel):
+    password: str = Field(..., min_length=1, max_length=8)
     name: str | None = Field(None, max_length=100)
     message: str | None = Field(None, max_length=30)
 
