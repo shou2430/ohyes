@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 
 class InvitationResponse(BaseModel):
@@ -26,4 +26,23 @@ class InvitationPublicResponse(BaseModel):
 
 
 class InvitationDeleteResponse(BaseModel):
+    message: str
+
+
+class PasswordVerifyRequest(BaseModel):
+    password: str = Field(..., min_length=1, max_length=8)
+
+
+class InvitationRevealResponse(BaseModel):
+    short_code: str
+    title: str
+    photo_url: str
+
+
+class InvitationRespondRequest(BaseModel):
+    name: str | None = Field(None, max_length=100)
+    message: str | None = Field(None, max_length=30)
+
+
+class InvitationRespondResponse(BaseModel):
     message: str
