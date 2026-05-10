@@ -18,13 +18,15 @@ The moment of delight when someone sees a personalized page made just for them a
 - [x] Each invitation generates a unique shareable URL (with unique ID) — Validated in Phase 02: Invitation Creation & Management
 
 ### Active
-- [ ] Recipient enters password to unlock the personalized page
-- [ ] Personalized page displays: title, photo, Yes button, and a "No" button that increasingly frantically dodges the cursor
-- [ ] Clicking "Yes" triggers a 30-character message dialog for the recipient
-- [ ] Clicking "Yes" deletes the invitation data and notifies the creator
 - [ ] Creator notification box with red dot/heart indicator showing "[Recipient] said yes to your [title]" + optional message
 - [ ] Invitations auto-expire and are deleted after 1 week
 - [ ] Bilingual UI (Traditional Chinese default with English toggle)
+
+### Validated in Phase 03: Recipient Experience
+- [x] Recipient enters password to unlock the personalized page
+- [x] Personalized page displays: title, photo, Yes button, and a "No" button that increasingly frantically dodges the cursor
+- [x] Clicking "Yes" triggers a 30-character message dialog for the recipient
+- [x] Clicking "Yes" deletes the invitation data and notifies the creator
 
 ### Out of Scope
 
@@ -59,7 +61,7 @@ The moment of delight when someone sees a personalized page made just for them a
 | PostgreSQL over MongoDB | Structured data, clear relations, better for expiry queries and Railway support | — Pending |
 | Railway volume for photos | Simplest option, avoids external service dependency for v1 | — Pending |
 | Bilingual (zh-TW + en) | Broaden audience, default Traditional Chinese with toggle | — Pending |
-| Increasingly frantic No button | Starts gentle, escalates — fun without being frustrating | — Pending |
+| Increasingly frantic No button | Starts gentle, escalates — fun without being frustrating | ✓ Validated (Phase 03) |
 | 2 invitation limit per user | Prevent abuse, keep it meaningful | — Pending |
 | 7-day expiry | Keep data fresh, auto-cleanup, prevent stale invitations | — Pending |
 
@@ -81,4 +83,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-05-09 after Phase 02 completion*
+*Last updated: 2026-05-10 after Phase 03 completion*
