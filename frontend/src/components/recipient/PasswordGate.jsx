@@ -24,13 +24,13 @@ export default function PasswordGate({ title, shortCode, onVerified }) {
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ password }),
+          body: JSON.stringify({ password: password.trim() }),
         }
       );
 
       if (res.ok) {
         const data = await res.json();
-        onVerified(data);
+        onVerified(data, password.trim());
       } else {
         setError(true);
         setShakeKey((k) => k + 1);

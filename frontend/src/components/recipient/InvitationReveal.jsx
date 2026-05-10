@@ -44,7 +44,6 @@ export default function InvitationReveal({ invitation, onYesClick }) {
     <div
       ref={containerRef}
       className="fixed inset-0 bg-cream overflow-hidden"
-      style={{ position: "relative" }}
     >
       {/* Sparkle particles layer */}
       <SparkleTrail particles={particles} />

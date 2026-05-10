@@ -25,7 +25,9 @@ export default function PostcardKeepsake({ invitation }) {
         const a = document.createElement("a");
         a.href = url;
         a.download = "ohyes-postcard.png";
+        document.body.appendChild(a);
         a.click();
+        document.body.removeChild(a);
         URL.revokeObjectURL(url);
       });
     } catch {

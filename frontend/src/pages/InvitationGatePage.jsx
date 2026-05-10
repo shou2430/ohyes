@@ -18,6 +18,7 @@ export default function InvitationGatePage() {
   const [screen, setScreen] = useState("loading");
   const [invitation, setInvitation] = useState(null);
   const [title, setTitle] = useState("");
+  const [verifiedPassword, setVerifiedPassword] = useState("");
 
   useEffect(() => {
     async function checkInvitation() {
@@ -53,8 +54,9 @@ export default function InvitationGatePage() {
     ? { opacity: 0 }
     : { x: "100%", opacity: 0 };
 
-  const handleVerified = (data) => {
+  const handleVerified = (data, password) => {
     setInvitation(data);
+    setVerifiedPassword(password);
     setScreen("reveal");
   };
 
@@ -152,7 +154,7 @@ export default function InvitationGatePage() {
             }
           >
             <div className="flex min-h-screen items-center justify-center px-4">
-              <MessageCard shortCode={code} onSent={handleSent} />
+              <MessageCard shortCode={code} password={verifiedPassword} onSent={handleSent} />
             </div>
           </motion.div>
         )}

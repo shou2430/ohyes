@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next";
 
 const API_URL = import.meta.env.VITE_API_URL || "";
 
-export default function MessageCard({ shortCode, onSent }) {
+export default function MessageCard({ shortCode, password, onSent }) {
   const { t } = useTranslation();
   const [name, setName] = useState("");
   const [message, setMessage] = useState("");
@@ -23,6 +23,7 @@ export default function MessageCard({ shortCode, onSent }) {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
+            password,
             name: skipMessage ? null : name.trim() || null,
             message: skipMessage ? null : message.trim() || null,
           }),

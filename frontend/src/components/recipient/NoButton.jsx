@@ -29,10 +29,13 @@ function randomInRange(min, max) {
   return min + Math.random() * (max - min);
 }
 
-const isMobile =
-  typeof window !== "undefined" &&
-  (window.matchMedia("(pointer: coarse)").matches ||
-    "ontouchstart" in window);
+function checkIsMobile() {
+  if (typeof window === "undefined") return false;
+  return (
+    window.matchMedia("(pointer: coarse)").matches ||
+    "ontouchstart" in window
+  );
+}
 
 export default function NoButton({ onDodge, dodgeCount, containerRef }) {
   const { t } = useTranslation();
@@ -171,7 +174,7 @@ export default function NoButton({ onDodge, dodgeCount, containerRef }) {
         }
       : {};
 
-  const springTransition = isMobile
+  const springTransition = checkIsMobile()
     ? { type: "tween", duration: 0.15 }
     : { type: "spring", stiffness: stage.stiffness, damping: stage.damping, mass: 1 };
 
