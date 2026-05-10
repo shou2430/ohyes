@@ -1,3 +1,4 @@
+import hmac
 import os
 import re
 import secrets
@@ -18,6 +19,8 @@ from app.schemas.invitation import (
     InvitationDeleteResponse,
     InvitationPublicResponse,
     InvitationResponse,
+    InvitationRevealResponse,
+    PasswordVerifyRequest,
 )
 from app.utils.photo import process_photo, validate_file_size
 
@@ -208,4 +211,33 @@ async def get_invitation_by_code(
     return InvitationPublicResponse(
         short_code=invitation.short_code,
         requires_password=True,
+    )
+
+
+@router.post("/by-code/{short_code}/verify", response_model=InvitationRevealResponse)
+async def verify_invitation_password(
+    short_code: str,
+    body: PasswordVerifyRequest,
+    db: AsyncSession = Depends(get_db),
+):
+    """Public endpoint: verify password and return invitation content."""
+    now = datetime.now(timezone.utc)
+    result = await db.execute(
+        select(Invitation).where(
+            Invitation.short_code == short_code,
+            Invitation.expires_at > now,
+        )
+    )
+    invitation = result.scalar_one_or_none()
+    if not invitation:
+        raise HTTPException(status_code=404, detail="Invitation not found or expired")
+
+    if not hmac.compare_digest(invitation.password, body.password):
+        raise HTTPException(status_code=401, detail="Incorrect password")
+
+    photo_url = f"/api/photos/{invitation.photo_filename}"
+    return InvitationRevealResponse(
+        short_code=invitation.short_code,
+        title=invitation.title,
+        photo_url=photo_url,
     )
