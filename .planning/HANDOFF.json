@@ -1,38 +1,32 @@
 {
   "version": "1.0",
-  "timestamp": "2026-05-08T08:58:59.570Z",
-  "phase": "1",
-  "phase_name": "Foundation & Authentication",
-  "phase_dir": ".planning/phases/01-foundation-authentication",
+  "timestamp": "2026-05-10T08:57:55.653Z",
+  "phase": "03",
+  "phase_name": "recipient-experience",
+  "phase_dir": ".planning/phases/03-recipient-experience",
   "plan": null,
   "task": null,
   "total_tasks": null,
   "status": "paused",
   "completed_tasks": [
-    {"id": 1, "name": "Phase 1 code complete (6/6 plans executed)", "status": "done"},
-    {"id": 2, "name": "Code review completed (01-REVIEW.md)", "status": "done"},
-    {"id": 3, "name": "Phase verification report (01-VERIFICATION.md)", "status": "done"},
-    {"id": 4, "name": "PROJECT.md evolved after phase completion", "status": "done"}
+    {"id": "03-01", "name": "Backend — Notification Model, Password Verify & Respond Endpoints", "status": "done"},
+    {"id": "03-02", "name": "Frontend — Password Gate, Invitation Reveal, No Button Dodge, Message Card & Postcard", "status": "done"}
   ],
-  "remaining_tasks": [
-    {"id": 5, "name": "Human verification of Phase 1 (manual UAT)", "status": "not_started"},
-    {"id": 6, "name": "Push to GitHub", "status": "not_started"},
-    {"id": 7, "name": "Set up Railway deployment", "status": "not_started"},
-    {"id": 8, "name": "Transition to Phase 2 after verification passes", "status": "not_started"}
+  "remaining_tasks": [],
+  "blockers": [
+    {"description": "Photo loading on recipient page — user reported photos not loading. onError handler added but root cause may be deployment/volume issue", "type": "technical", "workaround": "Check browser DevTools Network tab for /api/photos/ response. May need to re-upload photos after redeploy."},
+    {"description": "WR-007: Two critical integration tests are empty stubs (test_verify_correct_password and test_respond_creates_notification)", "type": "technical", "workaround": "Needs test DB fixture infrastructure to implement"}
   ],
-  "blockers": [],
   "human_actions_pending": [
-    {"action": "Push code to GitHub repository", "context": "Code is local only, needs to be on GitHub for Railway deployment", "blocking": true},
-    {"action": "Set up Google Cloud OAuth credentials (Client ID + Secret)", "context": "Required for Google OAuth login — must register redirect URI: <API_URL>/api/auth/callback", "blocking": true},
-    {"action": "Create Railway project with 3 services: backend (Docker), frontend (Static site), PostgreSQL plugin", "context": "Deployment target for Phase 1 verification", "blocking": true},
-    {"action": "Set Railway environment variables: GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, JWT_SECRET, SESSION_SECRET, FRONTEND_URL, API_URL, PHOTO_STORAGE_PATH", "context": "Backend needs these to run", "blocking": true},
-    {"action": "Manually verify: Google sign-in, session persistence, logout, /api/health", "context": "Phase 1 success criteria require human UAT", "blocking": true}
+    {"action": "Re-test recipient page after redeploy: verify photo loads, No button dodges correctly, EXIF orientation fixed", "context": "Three bugs were fixed: position:absolute→fixed, onError handler, EXIF transpose", "blocking": false},
+    {"action": "Complete manual UAT items from 03-VERIFICATION.md (11 items)", "context": "Phase 3 verified programmatically but 11 visual/interactive items need browser testing", "blocking": false}
   ],
   "decisions": [
-    {"decision": "Phase 1 code is complete — all 6 plans executed and verified", "rationale": "Code review and verification reports confirm implementation", "phase": "1"},
-    {"decision": "Human verification needed before Phase 2 transition", "rationale": "User wants to manually test OAuth flow and deployment before proceeding", "phase": "1"}
+    {"decision": "Respond endpoint now requires password (CR-001 fix)", "rationale": "Prevent unauthenticated invitation deletion by anyone who knows the short code", "phase": "03"},
+    {"decision": "No button uses position:fixed instead of absolute", "rationale": "Dodge coordinates are viewport-relative; absolute was relative to 400px content div causing button to fly off-screen", "phase": "03"},
+    {"decision": "EXIF transpose added to photo processing pipeline", "rationale": "Portrait photos from phones were displayed rotated 90° because EXIF orientation tag wasn't applied", "phase": "03"}
   ],
-  "uncommitted_files": [".planning/config.json"],
-  "next_action": "Push to GitHub, set up Railway + Google OAuth credentials, then manually verify Phase 1 success criteria (sign-in, session persistence, logout, health check)",
-  "context_notes": "Phase 1 code is fully written and reviewed. All 6 plans (01-01 through 01-06) have PLAN + SUMMARY. User wants to do human verification before moving to Phase 2. They need to: (1) push to GitHub, (2) create Railway project, (3) set up Google OAuth, (4) configure env vars, (5) manually test the auth flow. The STATE.md is slightly stale — still shows Phase 1 as 'Pending' but it's actually code-complete pending human verification."
+  "uncommitted_files": [],
+  "next_action": "Start Phase 4 (Notifications & Invitation Lifecycle) — /gsd-discuss-phase 4 or /gsd-plan-phase 4",
+  "context_notes": "Phase 3 complete with verification passed (14/14 must-haves). Code review found 14 issues, 7 fixed. User tested on deployed app and found 3 bugs (photo not loading, No button disappearing after 2 dodges, EXIF rotation) — all fixed and pushed. Still needs manual UAT for 11 visual/interactive items."
 }
