@@ -213,6 +213,7 @@ async def get_invitation_by_code(
 
     return InvitationPublicResponse(
         short_code=invitation.short_code,
+        title=invitation.title,
         requires_password=True,
     )
 

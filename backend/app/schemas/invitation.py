@@ -22,6 +22,7 @@ class InvitationResponse(BaseModel):
 
 class InvitationPublicResponse(BaseModel):
     short_code: str
+    title: str
     requires_password: bool = True
 
 
