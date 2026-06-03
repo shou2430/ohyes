@@ -4,7 +4,7 @@ import { Download } from "lucide-react";
 
 const API_URL = import.meta.env.VITE_API_URL || "";
 
-export default function PostcardKeepsake({ invitation }) {
+export default function PostcardKeepsake({ invitation, cachedPhotoUrl }) {
   const { t } = useTranslation();
   const postcardRef = useRef(null);
   const [downloading, setDownloading] = useState(false);
@@ -45,7 +45,7 @@ export default function PostcardKeepsake({ invitation }) {
         className="bg-white rounded-2xl shadow-xl overflow-hidden"
       >
         <img
-          src={`${API_URL}${invitation.photo_url}`}
+          src={cachedPhotoUrl || `${API_URL}${invitation.photo_url}`}
           alt={invitation.title}
           className="w-full aspect-[4/3] object-cover"
           crossOrigin="anonymous"

@@ -3,52 +3,26 @@ import { useTranslation } from "react-i18next";
 import { motion } from "motion/react";
 import NoButton from "./NoButton";
 import DodgeCounter from "./DodgeCounter";
-import SparkleTrail, { spawnSparkles } from "./SparkleTrail";
 import LoadingSpinner from "../LoadingSpinner";
 
 const API_URL = import.meta.env.VITE_API_URL || "";
-const MAX_PARTICLES = 40;
-const PARTICLE_LIFETIME = 900;
 
 export default function InvitationReveal({ invitation, onYesClick }) {
   const { t } = useTranslation();
   const containerRef = useRef(null);
   const [dodgeCount, setDodgeCount] = useState(0);
-  const [particles, setParticles] = useState([]);
   const [photoLoaded, setPhotoLoaded] = useState(false);
   const [photoError, setPhotoError] = useState(false);
 
-  const handleDodge = useCallback(
-    ({ oldX, oldY, newX, newY, stageIndex }) => {
-      setDodgeCount((c) => c + 1);
-
-      // Spawn sparkles along the dodge path
-      const newParticles = spawnSparkles(oldX, oldY, newX, newY, stageIndex);
-      if (newParticles.length > 0) {
-        setParticles((prev) => {
-          const combined = [...prev, ...newParticles];
-          // Cap at MAX_PARTICLES
-          return combined.slice(-MAX_PARTICLES);
-        });
-
-        // Clean up particles after lifetime
-        setTimeout(() => {
-          const ids = new Set(newParticles.map((p) => p.id));
-          setParticles((prev) => prev.filter((p) => !ids.has(p.id)));
-        }, PARTICLE_LIFETIME);
-      }
-    },
-    []
-  );
+  const handleDodge = useCallback(() => {
+    setDodgeCount((c) => c + 1);
+  }, []);
 
   return (
     <div
       ref={containerRef}
       className="fixed inset-0 bg-cream overflow-hidden"
     >
-      {/* Sparkle particles layer */}
-      <SparkleTrail particles={particles} />
-
       {/* Content layer */}
       <div className="flex min-h-screen items-center justify-center px-4 py-8">
         <div className="max-w-[400px] w-full relative z-20">

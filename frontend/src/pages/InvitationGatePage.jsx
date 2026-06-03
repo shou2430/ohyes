@@ -19,6 +19,30 @@ export default function InvitationGatePage() {
   const [invitation, setInvitation] = useState(null);
   const [title, setTitle] = useState("");
   const [verifiedPassword, setVerifiedPassword] = useState("");
+  const [cachedPhotoUrl, setCachedPhotoUrl] = useState(null);
+
+  // Cache the photo as a data URL before respond API deletes it
+  useEffect(() => {
+    if (!invitation?.photo_url) return;
+    const img = new Image();
+    img.crossOrigin = "anonymous";
+    img.onload = () => {
+      try {
+        const canvas = document.createElement("canvas");
+        canvas.width = img.naturalWidth;
+        canvas.height = img.naturalHeight;
+        canvas.getContext("2d").drawImage(img, 0, 0);
+        setCachedPhotoUrl(canvas.toDataURL("image/jpeg", 0.9));
+      } catch {
+        // CORS or tainted canvas — fall back to original URL
+        setCachedPhotoUrl(`${API_URL}${invitation.photo_url}`);
+      }
+    };
+    img.onerror = () => {
+      setCachedPhotoUrl(`${API_URL}${invitation.photo_url}`);
+    };
+    img.src = `${API_URL}${invitation.photo_url}`;
+  }, [invitation]);
 
   useEffect(() => {
     async function checkInvitation() {
@@ -180,7 +204,7 @@ export default function InvitationGatePage() {
             }
           >
             <div className="flex min-h-screen items-center justify-center px-4 py-8">
-              <PostcardKeepsake invitation={invitation} />
+              <PostcardKeepsake invitation={invitation} cachedPhotoUrl={cachedPhotoUrl} />
             </div>
           </motion.div>
         )}
