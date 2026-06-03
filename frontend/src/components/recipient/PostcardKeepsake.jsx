@@ -47,7 +47,7 @@ export default function PostcardKeepsake({ invitation, cachedPhotoUrl }) {
         <img
           src={cachedPhotoUrl || `${API_URL}${invitation.photo_url}`}
           alt={invitation.title}
-          className="w-full aspect-[4/3] object-cover"
+          className="w-full max-h-[420px] object-cover"
           crossOrigin="anonymous"
         />
         <div className="p-6">
@@ -55,8 +55,8 @@ export default function PostcardKeepsake({ invitation, cachedPhotoUrl }) {
             {invitation.title}
           </h2>
           <div className="mt-3 mx-auto w-16 h-0.5 bg-border rounded-full" />
-          <p className="mt-3 text-base text-text-secondary" style={{ fontFamily: "'Long Cang', 'Caveat', cursive" }}>
-            {t("recipient.postcardStamp")}
+          <p className="mt-3 text-lg text-text-secondary tracking-wide" style={{ fontFamily: "'Caveat', cursive" }}>
+            A yes worth chasing
           </p>
         </div>
       </div>
