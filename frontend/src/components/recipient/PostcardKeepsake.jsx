@@ -55,7 +55,7 @@ export default function PostcardKeepsake({ invitation, cachedPhotoUrl }) {
             {invitation.title}
           </h2>
           <div className="mt-3 mx-auto w-16 h-0.5 bg-border rounded-full" />
-          <p className="mt-3 text-sm text-text-secondary">
+          <p className="mt-3 text-base text-text-secondary" style={{ fontFamily: "'Long Cang', 'Caveat', cursive" }}>
             {t("recipient.postcardStamp")}
           </p>
         </div>

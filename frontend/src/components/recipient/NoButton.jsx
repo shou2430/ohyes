@@ -3,11 +3,11 @@ import { useTranslation } from "react-i18next";
 import { motion } from "motion/react";
 
 const STAGES = [
-  { min: 0, max: 2, stiffness: 200, damping: 20, distMin: 60, distMax: 80, wobble: 0 },
-  { min: 3, max: 5, stiffness: 350, damping: 15, distMin: 100, distMax: 140, wobble: 0 },
-  { min: 6, max: 9, stiffness: 500, damping: 12, distMin: 160, distMax: 200, wobble: 0 },
-  { min: 10, max: 14, stiffness: 700, damping: 10, distMin: 200, distMax: 260, wobble: 3 },
-  { min: 15, max: Infinity, stiffness: 900, damping: 8, distMin: 0, distMax: 0, wobble: 5 },
+  { min: 0, max: 2, stiffness: 400, damping: 18, distMin: 120, distMax: 180, wobble: 0 },
+  { min: 3, max: 5, stiffness: 600, damping: 14, distMin: 180, distMax: 260, wobble: 0 },
+  { min: 6, max: 9, stiffness: 800, damping: 10, distMin: 250, distMax: 350, wobble: 0 },
+  { min: 10, max: 14, stiffness: 1000, damping: 8, distMin: 300, distMax: 420, wobble: 3 },
+  { min: 15, max: Infinity, stiffness: 1200, damping: 6, distMin: 0, distMax: 0, wobble: 5 },
 ];
 
 const STAGE5_TEXTS = ["noWait", "noPlease", "noGiveUp", "noFine"];
