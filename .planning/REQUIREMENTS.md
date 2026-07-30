@@ -70,6 +70,10 @@ Deferred to future release. Tracked but not in current roadmap.
 - **CUST-V2-01**: Preset themes/colors for invitation pages
 - **CUST-V2-02**: Custom celebration animations
 
+### Infrastructure
+
+- **INFR-V2-01**: Migrate photo storage from the Railway persistent volume to Railway Storage Buckets, enabling the backend to scale horizontally (target: 3 replicas). A Railway volume can only be mounted by one active deployment, so the volume — not the app code — is what currently pins the backend to a single container. Overturns INFR-02. Touches `backend/app/utils/photo.py`, `backend/app/routers/photos.py`, the create/delete/respond/cleanup paths, and Railway service config; needs a migration plan for photos already live in production. *Decided 2026-07-30 during Phase 4 discussion: v1 stays on the single-container volume setup; this lands in the next milestone.*
+
 ## Out of Scope
 
 | Feature | Reason |
