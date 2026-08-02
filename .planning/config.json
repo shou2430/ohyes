@@ -37,5 +37,6 @@
   "phase_naming": "sequential",
   "agent_skills": {},
   "mode": "interactive",
-  "granularity": "standard"
+  "granularity": "standard",
+  "response_language": "繁體中文"
 }
