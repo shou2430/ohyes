@@ -218,7 +218,7 @@ The `border-l-2` is present in **both** states (transparent when read) so the 2p
 
 3. **Relative timestamp** — `mt-2 text-sm text-text-secondary`, wrapped in `<time dateTime={iso} title={absoluteLocalString}>`.
 
-**Row height varies** (2 to ~6 content lines in the worst case). This is accepted — volume is low and dividers (`divide-y divide-border`) carry the rhythm. Height is bounded by the input caps in the Cross-Phase Amendment, not by any truncation in this component.
+**Row height varies** (2 to ~4 content lines in the worst case, more for zh-TW). This is accepted — volume is low and dividers (`divide-y divide-border`) carry the rhythm. Height is bounded by the input caps in the Cross-Phase Amendment, not by any truncation in this component.
 
 ### 4. Empty state (inside the panel)
 
@@ -246,25 +246,33 @@ Notification retention (30-day sweep, D-07) is likewise invisible: old rows are 
 
 ---
 
-## Cross-Phase Amendment — Invitation Title Length Cap
+## Cross-Phase Amendment — Input Length Caps
 
-**This section modifies a Phase 2 surface.** It is recorded here because Phase 4 is what surfaced the defect and what depends on the fix. The planner must include it in the Phase 4 plan.
+**This section modifies Phase 2 and Phase 3 surfaces.** It is recorded here because Phase 4 is what surfaced the defect and what depends on the fix. The planner must include it in the Phase 4 plan.
 
 ### Why
 
-The notification sentence interpolates a creator-supplied invitation title. Audit of the shipped code found that title has **no length constraint at any layer**:
+The notification sentence interpolates two user-supplied strings — a creator's invitation title and a recipient's name. Audit of the shipped code found the title has **no length constraint at any layer**, and the name is capped so loosely it may as well be unbounded:
 
-| Layer | File | State before this amendment |
-|-------|------|------------------------------|
-| DB column | `backend/app/models/invitation.py:17` | `String(255)` |
-| Request schema | `backend/app/schemas/invitation.py` | no `max_length` validator |
-| Form input | `frontend/src/pages/CreateInvitationPage.jsx:170` | no `maxLength` attribute |
+| Field | Layer | File | Before |
+|-------|-------|------|--------|
+| Title | DB column | `backend/app/models/invitation.py:17` | `String(255)` |
+| Title | Request schema | `backend/app/schemas/invitation.py` | no `max_length` validator |
+| Title | Form input | `CreateInvitationPage.jsx:170` | no `maxLength` attribute |
+| Name | DB column | `backend/app/models/notification.py` | `String(100)` |
+| Name | Request schema | `InvitationRespondRequest` | `max_length=100` |
+| Name | Form input | `MessageCard.jsx:66` | `maxLength={100}` |
 
-A 255-character title plus a 100-character recipient name yields a ~355-character sentence. In the 343px mobile panel at 14px that is roughly 7 lines of Latin text and up to ~13 lines of zh-TW CJK — a single notification would fill the entire panel. The "no truncation" rule in `NotificationRow` is only defensible once the input is bounded.
+A 255-character title plus a 100-character name yields a ~355-character sentence. In the 343px mobile panel at 14px that is roughly 7 lines of Latin text and up to ~13 lines of zh-TW CJK — a single notification would fill the entire panel. The "no truncation" rule in `NotificationRow` is only defensible once both inputs are bounded.
 
-**User decision (2026-08-02):** cap the title at **100 characters** with an in-place counter, rather than clamping the notification row. Fixing it at the source protects every surface that renders a title — the dashboard card, the recipient reveal page, and the notification row — not just this phase.
+**User decisions (2026-08-02):**
+- Cap the **title at 100 characters** with an in-place counter, rather than clamping the notification row. Fixing it at the source protects every surface that renders a title — the dashboard card, the recipient reveal page, and the notification row — not just this phase.
+- Cap the **recipient name at 20 characters**. After the title cap, the name became the larger contributor to sentence length; 20 is generous for a real name.
+- The **recipient message stays at 30** characters — already enforced at all three layers, unchanged.
 
-### Contract
+> **Accepted tradeoff on the 20-character name.** The field is labelled as a name, but nothing stops a recipient treating it as a free-text greeting ("住在隔壁的王先生和王太太"). At 20 characters that style of input is truncated. This was raised and accepted when the cap was chosen — the counter makes the limit visible before the user hits it.
+
+### Contract — invitation title (100)
 
 **Backend** — `backend/app/schemas/invitation.py`, on the invitation-create request model:
 ```python
@@ -281,17 +289,41 @@ No Alembic migration: the column is already `String(255)`, and 100 < 255. Existi
 </p>
 ```
 
-Token compliance: `text-sm` is the existing Body role, `text-text-secondary` is an existing token, `mt-1` is 4px. Zero new tokens, zero new dependencies.
-
 **Ordering when both the counter and an error are present:** counter first, then `errors.title`. The error paragraph keeps its own `mt-1`, so an errored field shows counter and error stacked — matching how the recipient form already behaves.
 
-**No hard-stop styling.** `maxLength` silently prevents the 101st character; the counter does **not** turn red or destructive on approach, because it can never be exceeded. This matches `MessageCard`, which also has no warning state at 30/30.
+### Contract — recipient name (20)
+
+**Backend** — `backend/app/schemas/invitation.py`, `InvitationRespondRequest`:
+```python
+name: str | None = Field(None, max_length=20)
+```
+No migration: `notifications.recipient_name` stays `String(100)`, and 20 < 100.
+
+**Frontend** — `MessageCard.jsx:66`, name `<input>`: `maxLength={100}` → `maxLength={20}`.
+
+**In-place counter — newly added to the name field.** The name input currently has **no** counter, which was fine at 100 (nobody reaches it) but is not fine at 20, where users will hit the limit and need to see why input stopped. The sibling message field at 30 already has one, so adding it here is consistency rather than invention:
+```jsx
+<p className="mt-1 text-right text-sm text-text-secondary" aria-live="polite">
+  {name.length}/20
+</p>
+```
+
+> This counter is an **implementation judgment**, not part of the user's stated decision. The instruction was the 20-character cap; a silent cap with no counter would be a worse experience than the field it sits next to. Flag it back if you disagree — removing it is a one-line change.
+
+### Shared rules for all three counters
+
+Token compliance: `text-sm` is the existing Body role, `text-text-secondary` is an existing token, `mt-1` is 4px. Zero new tokens, zero new dependencies, no new i18n keys.
+
+**No hard-stop styling.** `maxLength` makes the over-limit character unreachable, so the counter does **not** turn red or destructive on approach — it can never be exceeded. This matches the shipped `MessageCard`, which has no warning state at 30/30.
 
 ### Resulting bound on the notification sentence
 
-With title ≤ 100 and recipient name ≤ 100, the worst-case sentence is ~217 characters — roughly 5 lines of Latin or ~9 lines of zh-TW at 375px. Bounded and scrollable, and no longer able to fill the panel with one item.
+| | Title | Name | Worst-case sentence | Lines at 375px |
+|---|-------|------|--------------------|----------------|
+| Before | 255 | 100 | ~355 chars | ~7 Latin / ~13 zh-TW |
+| After | 100 | 20 | ~137 chars | ~3 Latin / ~6 zh-TW |
 
-> ⚠ **Open follow-up:** `recipient_name` is still `maxLength={100}` (`MessageCard.jsx:66`) and remains the larger of the two contributors to sentence length. See the FLAGS section.
+Bounded, scrollable, and no longer able to fill the panel with a single item.
 
 ---
 
@@ -452,8 +484,9 @@ All strings are authored as i18n keys in **both** `frontend/src/i18n/en.json` an
 - `{{count}}` in `notifications.ariaUnread` uses i18next interpolation, not pluralization — zh-TW has no plural forms and the en string reads correctly for 1 ("1 unread").
 - Do not add a "Mark all as read" string. D-08 makes the action implicit.
 - Do not add a "See all notifications" / "View all" link. There is no dedicated route (D-01).
-- The title counter from the Cross-Phase Amendment needs **no i18n key**. It renders as `{title.length}/100` — digits and a slash, identical in both languages. This matches the shipped `MessageCard` counter, which also hardcodes `{message.length}/30`. Do not invent a `create.titleCounter` key.
-- The backend `max_length=100` rejection needs no new user-facing copy either: `maxLength` on the input makes the 101st character unreachable in the UI, so the validator is a defence-in-depth guard that a normal user never triggers.
+- Both counters from the Cross-Phase Amendment need **no i18n key**. They render as `{title.length}/100` and `{name.length}/20` — digits and a slash, identical in both languages. This matches the shipped `MessageCard` counter, which also hardcodes `{message.length}/30`. Do not invent `create.titleCounter` or `recipient.nameCounter` keys.
+- The backend `max_length` rejections need no new user-facing copy either: `maxLength` on each input makes the over-limit character unreachable in the UI, so the validators are defence-in-depth guards a normal user never triggers.
+- **Do not change `recipient.namePlaceholder` or `recipient.nameLabel`** to advertise the 20-character limit. The counter carries that information; duplicating it in the label would crowd a field that is already tight at 375px.
 
 ---
 
@@ -467,7 +500,7 @@ Mobile-first. 375px is the minimum supported viewport.
 | >= 640px (sm) | Panel becomes `absolute`, `w-[360px]`, anchored `right-0 top-full mt-2` on the button wrapper, extending leftward. Max height `420px`. Transform origin: top right. Top bar gutter becomes `px-8` (existing). |
 | >= 1024px (lg) | No further change. The panel is already at its terminal size. |
 
-At 375px the notification sentence wraps to at most ~5 lines of Latin text (~9 lines of zh-TW) in the worst case, given the 100-character title cap and the 100-character recipient name. Wrapping is expected and unstyled — no truncation, no `line-clamp`, no ellipsis. Recipient messages are DB-capped at 30 characters and never wrap past 2 lines.
+At 375px the notification sentence wraps to at most ~3 lines of Latin text (~6 lines of zh-TW) in the worst case, given the 100-character title cap and the 20-character name cap. Wrapping is expected and unstyled — no truncation, no `line-clamp`, no ellipsis. Recipient messages are DB-capped at 30 characters and never wrap past 2 lines.
 
 The heart button and its 44px target are identical at every breakpoint — the panel is the only responsive element.
 
@@ -538,7 +571,7 @@ Generated by `ui-consideration-probe.cjs` over 5 declared surfaces, then resolve
 | populated | ✅ covered | Name + title + message + timestamp all render: sentence line, quote block with a 2px left rule, relative `<time>` |
 | partial | ✅ covered | Null/empty `recipient_name` → `notifications.saidYesAnonymous`; null/empty `recipient_message` → quote block omitted entirely, no empty rule, no placeholder. Both columns are nullable in `models/notification.py`. |
 | overflow | ✅ covered | Row height grows with content — no fixed height, no clipping, no ellipsis |
-| long-text | 🧪 backstop | Now **bounded at the source** by the 100-character title cap (Cross-Phase Amendment) rather than by truncation. Worst case ≈5 Latin / ≈9 zh-TW lines in the 343px mobile panel. Retained as a backstop because nobody has yet looked at ~9 lines of CJK in that panel — needs a held-out visual check at 375px in zh-TW. |
+| long-text | 🧪 backstop | Now **bounded at the source** by the 100-character title cap and 20-character name cap (Cross-Phase Amendment) rather than by truncation. Worst case ≈3 Latin / ≈6 zh-TW lines in the 343px mobile panel. Retained as a backstop because the worst case has not yet been rendered — needs a held-out visual check at 375px in zh-TW with a 100-char title and a 20-char name. |
 | empty | ⊘ dismissed | A row never renders for an absent notification; emptiness is the list's concern (E4/E5) |
 | loading | ⊘ dismissed | Rows never render skeletons — a row exists only once its data is in hand |
 | error | ⊘ dismissed | A row cannot fail independently; there is no per-row request |
@@ -580,13 +613,14 @@ Generated by `ui-consideration-probe.cjs` over 5 declared surfaces, then resolve
 
 ## FLAGS (non-blocking)
 
-Findings from the review pass. None block planning; all three should reach the planner.
+Findings from the review pass. None block planning; all four should reach the planner. F-03 is resolved and kept for the audit trail.
 
 | # | Flag | Detail |
 |---|------|--------|
 | F-01 | Dot visibility formula was implied, not stated | Now written explicitly as `showDot = unreadCount > 0 && !panelOpen` in Interaction Contracts § "Dot appears". Without the second term the optimistic clear and the 30s poll fight over the dot. |
 | F-02 | `position: fixed` containing-block trap | The mobile panel is `fixed` inside a `relative` wrapper. Correct today, but a `transform` on any **ancestor** would silently re-anchor it. Noted inline in the panel positioning section; the bounce is deliberately on a sibling `motion.span`. |
-| F-03 | `recipient_name` remains uncapped at 100 | `MessageCard.jsx:66` allows a 100-character name, now the larger of the two contributors to sentence length. The title cap fixes the creator side only. **Awaiting a user decision** — see the open question at the end of the ui-phase run. |
+| F-03 | ~~`recipient_name` remains uncapped at 100~~ | ✅ **Resolved 2026-08-02.** User capped the name at 20 characters. Both layers change (`InvitationRespondRequest`, `MessageCard.jsx:66`) and a counter is added to the field. Worst-case sentence drops from ~217 to ~137 characters. See Cross-Phase Amendment § "Contract — recipient name (20)". |
+| F-04 | Name counter is an implementation judgment | The 20-char cap was the user's decision; adding a visible counter to the name field was not explicitly requested. Specified because a silent cap sits badly next to the message field's existing 30-char counter. One-line removal if unwanted. |
 
 ---
 
@@ -621,8 +655,10 @@ What this phase inherits unchanged versus what it adds — for the auditor.
 | Top bar (`h-16`, white, `border-b`, `px-4 sm:px-8`) | Phase 1 / live `DashboardPage.jsx:86` | inherited; one child added to the right cluster |
 | `notifications` i18n namespace | — | **new** in this phase (en + zh-TW) |
 | `NotificationBell` / `NotificationPanel` / `NotificationRow` | — | **new** in this phase |
-| Character-counter pattern (`mt-1 text-right text-sm text-text-secondary`, `aria-live="polite"`) | Phase 3 `MessageCard.jsx:86-88` | inherited verbatim for the new title counter — no new tokens |
+| Character-counter pattern (`mt-1 text-right text-sm text-text-secondary`, `aria-live="polite"`) | Phase 3 `MessageCard.jsx:86-88` | inherited verbatim for the two new counters — no new tokens |
 | Invitation title 100-character cap | — | **new** — amends the Phase 2 create form and request schema (see Cross-Phase Amendment) |
+| Recipient name 20-character cap + counter | — | **new** — amends the Phase 3 `MessageCard` and `InvitationRespondRequest` (was 100, no counter) |
+| Recipient message 30-character cap | Phase 3 | inherited unchanged — already enforced at all three layers |
 
 ---
 
@@ -650,4 +686,4 @@ What this phase inherits unchanged versus what it adds — for the auditor.
 | Spacing scale and typography roles match Phases 1–3 | ✓ confirmed against `01-UI-SPEC.md`, `02-UI-SPEC.md`, `03-UI-SPEC.md` |
 | "Titles are free-form with no length cap" | ✗ **confirmed as a defect** — no cap at any layer; drove the Cross-Phase Amendment |
 
-**Approval:** approved by orchestrator review, 2026-08-02. 6/6 dimensions PASS, 3 non-blocking FLAGs (F-01 to F-03). F-03 awaits a user decision.
+**Approval:** approved by orchestrator review, 2026-08-02. 6/6 dimensions PASS, 4 non-blocking FLAGs (F-01 to F-04); F-03 resolved by user decision the same day.
