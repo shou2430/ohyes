@@ -1,10 +1,11 @@
 ---
 phase: 4
 slug: notifications-invitation-lifecycle
-status: draft
+status: approved
 shadcn_initialized: false
 preset: none
 created: 2026-08-02
+approved: 2026-08-02
 ---
 
 # Phase 4 — UI Design Contract
@@ -162,6 +163,8 @@ aria-hidden="true"
 
 Same component, two widths. **No bottom sheet, no full-screen overlay, no backdrop scrim** (D-05). The panel does not push the invitation cards down — it overlays them.
 
+> ⚠ **Do not place the panel inside a transformed ancestor.** A CSS `transform` on any ancestor creates a containing block for `position: fixed` descendants, which would silently re-anchor the mobile panel to that ancestor instead of the viewport. The one-shot bounce is therefore specified on a `motion.span` wrapping the heart glyph — a *sibling* of the panel, never a parent. An element's own transform does not affect its own containing block, so the panel's entrance animation is safe; an ancestor's would not be.
+
 **Container:**
 ```
 className="z-40 overflow-hidden rounded-xl border border-border bg-white shadow-lg"
@@ -200,7 +203,7 @@ The `border-l-2` is present in **both** states (transparent when read) so the 2p
 
 **Content, top to bottom:**
 
-1. **Sentence** — `text-sm text-text-primary` (line-height 1.5, wraps freely; no truncation, no `line-clamp`).
+1. **Sentence** — `text-sm text-text-primary` (line-height 1.5, wraps freely; no truncation, no `line-clamp`). Safe to leave unclamped **only because the inputs are now bounded at the source** — see "Cross-Phase Amendment" below. Do not remove that cap without revisiting this rule.
    - With a name: `notifications.saidYes` → `"{{name}} said yes to your “{{title}}”"`
    - Name null or empty string: `notifications.saidYesAnonymous` → `"Someone said yes to your “{{title}}”"`
    - `recipient_name` is nullable in `backend/app/models/notification.py` (the recipient can use "Skip message"), so the anonymous branch is required, not optional.
@@ -215,7 +218,7 @@ The `border-l-2` is present in **both** states (transparent when read) so the 2p
 
 3. **Relative timestamp** — `mt-2 text-sm text-text-secondary`, wrapped in `<time dateTime={iso} title={absoluteLocalString}>`.
 
-**Row height varies** (2 or 3 content lines). This is accepted — volume is low and dividers (`divide-y divide-border`) carry the rhythm.
+**Row height varies** (2 to ~6 content lines in the worst case). This is accepted — volume is low and dividers (`divide-y divide-border`) carry the rhythm. Height is bounded by the input caps in the Cross-Phase Amendment, not by any truncation in this component.
 
 ### 4. Empty state (inside the panel)
 
@@ -240,6 +243,55 @@ Shown when the list is empty. The panel still opens; the heart is never disabled
 The Phase 2 days-remaining countdown (`dashboard.daysRemaining`) is the creator's only and sufficient advance warning. It is unchanged.
 
 Notification retention (30-day sweep, D-07) is likewise invisible: old rows are simply absent from the next poll response.
+
+---
+
+## Cross-Phase Amendment — Invitation Title Length Cap
+
+**This section modifies a Phase 2 surface.** It is recorded here because Phase 4 is what surfaced the defect and what depends on the fix. The planner must include it in the Phase 4 plan.
+
+### Why
+
+The notification sentence interpolates a creator-supplied invitation title. Audit of the shipped code found that title has **no length constraint at any layer**:
+
+| Layer | File | State before this amendment |
+|-------|------|------------------------------|
+| DB column | `backend/app/models/invitation.py:17` | `String(255)` |
+| Request schema | `backend/app/schemas/invitation.py` | no `max_length` validator |
+| Form input | `frontend/src/pages/CreateInvitationPage.jsx:170` | no `maxLength` attribute |
+
+A 255-character title plus a 100-character recipient name yields a ~355-character sentence. In the 343px mobile panel at 14px that is roughly 7 lines of Latin text and up to ~13 lines of zh-TW CJK — a single notification would fill the entire panel. The "no truncation" rule in `NotificationRow` is only defensible once the input is bounded.
+
+**User decision (2026-08-02):** cap the title at **100 characters** with an in-place counter, rather than clamping the notification row. Fixing it at the source protects every surface that renders a title — the dashboard card, the recipient reveal page, and the notification row — not just this phase.
+
+### Contract
+
+**Backend** — `backend/app/schemas/invitation.py`, on the invitation-create request model:
+```python
+title: str = Field(..., min_length=1, max_length=100)
+```
+No Alembic migration: the column is already `String(255)`, and 100 < 255. Existing rows longer than 100 are not rewritten — the 7-day TTL plus the 2-invitation-per-user limit means any such row disappears on its own within a week.
+
+**Frontend** — `CreateInvitationPage.jsx`, title `<input>` (line 170): add `maxLength={100}`.
+
+**In-place counter** — reuse the shipped pattern from `MessageCard.jsx:86-88` verbatim, placed after the input and before the existing error paragraph:
+```jsx
+<p className="mt-1 text-right text-sm text-text-secondary" aria-live="polite">
+  {title.length}/100
+</p>
+```
+
+Token compliance: `text-sm` is the existing Body role, `text-text-secondary` is an existing token, `mt-1` is 4px. Zero new tokens, zero new dependencies.
+
+**Ordering when both the counter and an error are present:** counter first, then `errors.title`. The error paragraph keeps its own `mt-1`, so an errored field shows counter and error stacked — matching how the recipient form already behaves.
+
+**No hard-stop styling.** `maxLength` silently prevents the 101st character; the counter does **not** turn red or destructive on approach, because it can never be exceeded. This matches `MessageCard`, which also has no warning state at 30/30.
+
+### Resulting bound on the notification sentence
+
+With title ≤ 100 and recipient name ≤ 100, the worst-case sentence is ~217 characters — roughly 5 lines of Latin or ~9 lines of zh-TW at 375px. Bounded and scrollable, and no longer able to fill the panel with one item.
+
+> ⚠ **Open follow-up:** `recipient_name` is still `maxLength={100}` (`MessageCard.jsx:66`) and remains the larger of the two contributors to sentence length. See the FLAGS section.
 
 ---
 
@@ -269,6 +321,12 @@ No loading state at any point in this sequence.
 Fails silently. No toast, no revert, no retry, no console-visible user feedback. The dot naturally reappears on the next 30-second poll because the server still has `is_read = false`. This is deliberately different from the delete/copy flows, which do toast on failure (Phase 2 D-18) — those are user-initiated, this is not.
 
 ### Dot appears (D-16)
+
+**Dot visibility is exactly:**
+```
+showDot = unreadCount > 0 && !panelOpen
+```
+State this explicitly in the implementation. Without the `&& !panelOpen` term, the optimistic clear (open step 4) and the 30-second poll fight over the dot: a notification arriving after the mark-read call is genuinely unread server-side, so the next tick while the panel is still open would re-raise the dot underneath the open panel.
 
 When the derived unread count transitions from `0` to `>0` (poll tick or first load), the heart plays a **one-shot** spring bounce and the dot scales in. Once per transition — never on every poll tick, never while the count merely grows from 1 to 2.
 
@@ -394,6 +452,8 @@ All strings are authored as i18n keys in **both** `frontend/src/i18n/en.json` an
 - `{{count}}` in `notifications.ariaUnread` uses i18next interpolation, not pluralization — zh-TW has no plural forms and the en string reads correctly for 1 ("1 unread").
 - Do not add a "Mark all as read" string. D-08 makes the action implicit.
 - Do not add a "See all notifications" / "View all" link. There is no dedicated route (D-01).
+- The title counter from the Cross-Phase Amendment needs **no i18n key**. It renders as `{title.length}/100` — digits and a slash, identical in both languages. This matches the shipped `MessageCard` counter, which also hardcodes `{message.length}/30`. Do not invent a `create.titleCounter` key.
+- The backend `max_length=100` rejection needs no new user-facing copy either: `maxLength` on the input makes the 101st character unreachable in the UI, so the validator is a defence-in-depth guard that a normal user never triggers.
 
 ---
 
@@ -407,7 +467,7 @@ Mobile-first. 375px is the minimum supported viewport.
 | >= 640px (sm) | Panel becomes `absolute`, `w-[360px]`, anchored `right-0 top-full mt-2` on the button wrapper, extending leftward. Max height `420px`. Transform origin: top right. Top bar gutter becomes `px-8` (existing). |
 | >= 1024px (lg) | No further change. The panel is already at its terminal size. |
 
-At 375px the notification sentence wraps to at most 3 lines for a long title; wrapping is expected and unstyled — no truncation, no `line-clamp`, no ellipsis. Recipient messages are DB-capped at 30 characters and never wrap past 2 lines.
+At 375px the notification sentence wraps to at most ~5 lines of Latin text (~9 lines of zh-TW) in the worst case, given the 100-character title cap and the 100-character recipient name. Wrapping is expected and unstyled — no truncation, no `line-clamp`, no ellipsis. Recipient messages are DB-capped at 30 characters and never wrap past 2 lines.
 
 The heart button and its 44px target are identical at every breakpoint — the panel is the only responsive element.
 
@@ -442,19 +502,91 @@ The heart button and its 44px target are identical at every breakpoint — the p
 
 ## UI Considerations
 
-Applicable state considerations resolved: 8 covered, 1 backstop, 0 unresolved
+Generated by `ui-consideration-probe.cjs` over 5 declared surfaces, then resolved. **39 applicable: 24 covered, 1 backstop, 14 dismissed, 0 unresolved.**
 
-| Category | Element(s) | Status | Resolution / Reason |
-|----------|------------|--------|---------------------|
-| empty | notification panel list | ✅ covered | With zero notifications the panel still opens and renders the `notifications.emptyHeading` / `notifications.emptyBody` empty state; the heart button is never disabled or hidden (D-04) |
-| loading | notification panel | ✅ covered | The panel never renders a loading state — the 30s poll holds the full list, so open is instantaneous with data already in hand (D-15). `LoadingSpinner` must not appear inside the panel. |
-| error | poll request, mark-read request | ✅ covered | Both fail silently with no user-visible copy: mark-read is optimistic and never reverts (D-10); poll network errors are retried on the next tick, 401 clears `localStorage` and redirects to `/` (D-17). See the Copywriting Contract's "Error state, explicitly N/A". |
-| populated | notification row | ✅ covered | A row with a name, a title, a message, and a timestamp renders all four: sentence line, message quote with a 2px left rule, and a relative `<time>` |
-| partial | notification row | ✅ covered | `recipient_name` null/empty falls back to `notifications.saidYesAnonymous`; `recipient_message` null/empty omits the quote block entirely (no empty rule, no placeholder). Both branches follow from the nullable columns in `models/notification.py`. |
-| overflow | notification panel list | ✅ covered | List exceeding the panel height scrolls internally — `max-h-[70vh]` mobile / `sm:max-h-[420px]`, `overflow-y-auto overscroll-contain`, `tabIndex={0}` for keyboard scroll. No pagination and no `limit` param; the 30-day TTL bounds growth (D-06, D-07). |
-| zero-one-many | red dot / unread count | ✅ covered | Zero unread: no dot. One or many unread: one identical dot — never a numeric badge (D-02). The count exists only in the button's `aria-label`. |
-| long-text | notification sentence (long invitation title) | 🧪 backstop | Long titles wrap freely across up to 3 lines at 375px with no truncation, no `line-clamp`, and no horizontal overflow of the 343px mobile panel. Titles are free-form with no length cap in the create form, so this needs a held-out visual check at the 375px minimum viewport. |
-| interaction-dismiss | notification panel | ✅ covered | Escape, outside `pointerdown`, `focusout` past the wrapper, and toggling the heart all close the panel and return focus to the button; no focus trap |
+**Kind-confirmation applied.** The probe's prose classifier returned 38 items and did **not** raise `zero-one-many` for E1 (the heart bell) — a partial-cue miss, since the bell is precisely a count-bearing element. That category was added by hand and resolved below. Every other detected kind was confirmed correct.
+
+### E1 — `NotificationBell` (heart + dot)
+
+| Category | Status | Resolution / Reason |
+|----------|--------|---------------------|
+| empty | ✅ covered | Zero unread → no dot, resting outline heart, button still enabled and clickable (D-04) |
+| loading | ✅ covered | No skeleton. Before the first poll resolves the derived count is 0, so the bell renders resting; the dot appears only once real data arrives |
+| error | ✅ covered | Poll failure leaves the bell in its last known state (D-17); a 401 unmounts the page entirely via redirect |
+| populated | ✅ covered | ≥1 unread → accent heart stroke + dot + one-shot bounce on the `0 → >0` edge |
+| zero-one-many | ✅ covered | *(added at kind-confirmation)* Zero → no dot. One **or many** → one identical dot, never a numeric badge (D-02). The count exists only in the `aria-label`. |
+| overflow | ⊘ dismissed | Fixed 44px button around a fixed 20px glyph — no content can overflow |
+| long-text | ⊘ dismissed | Icon-only button with no visible text; the only string is the `aria-label`, which is never rendered visually |
+
+### E2 — `NotificationPanel` (dropdown container)
+
+| Category | Status | Resolution / Reason |
+|----------|--------|---------------------|
+| empty | ✅ covered | Delegates to the empty state (component 4); the panel still opens normally |
+| loading | ✅ covered | Never renders a loading state — the poll already holds the full list (D-15). `LoadingSpinner` must not appear inside the panel. |
+| error | ✅ covered | No error surface at all; both failure modes are silent (D-10, D-17) |
+| populated | ✅ covered | Sticky header + scroll region + rows |
+| overflow | ✅ covered | `max-h-[70vh]` mobile / `sm:max-h-[420px]` with internal scroll; the panel never grows past the viewport |
+| long-text | ✅ covered | Panel width is fixed at both breakpoints; long content wraps inside rows and can never widen the panel |
+| partial | ⊘ dismissed | Partiality is a row-level concern; the panel holds no partially-populated form |
+| zero-one-many | ⊘ dismissed | Singleton — only one panel can be open; it is not a collection |
+
+### E3 — `NotificationRow`
+
+| Category | Status | Resolution / Reason |
+|----------|--------|---------------------|
+| populated | ✅ covered | Name + title + message + timestamp all render: sentence line, quote block with a 2px left rule, relative `<time>` |
+| partial | ✅ covered | Null/empty `recipient_name` → `notifications.saidYesAnonymous`; null/empty `recipient_message` → quote block omitted entirely, no empty rule, no placeholder. Both columns are nullable in `models/notification.py`. |
+| overflow | ✅ covered | Row height grows with content — no fixed height, no clipping, no ellipsis |
+| long-text | 🧪 backstop | Now **bounded at the source** by the 100-character title cap (Cross-Phase Amendment) rather than by truncation. Worst case ≈5 Latin / ≈9 zh-TW lines in the 343px mobile panel. Retained as a backstop because nobody has yet looked at ~9 lines of CJK in that panel — needs a held-out visual check at 375px in zh-TW. |
+| empty | ⊘ dismissed | A row never renders for an absent notification; emptiness is the list's concern (E4/E5) |
+| loading | ⊘ dismissed | Rows never render skeletons — a row exists only once its data is in hand |
+| error | ⊘ dismissed | A row cannot fail independently; there is no per-row request |
+| zero-one-many | ⊘ dismissed | A row is a single item, not a collection |
+
+### E4 — Empty state
+
+| Category | Status | Resolution / Reason |
+|----------|--------|---------------------|
+| empty | ✅ covered | This *is* the empty state — 32px outline heart, `emptyHeading`, `emptyBody` |
+| loading | ✅ covered | Never shown speculatively; renders only after the poll returns an empty list |
+| long-text | ✅ covered | Copy is fixed i18n strings; both zh-TW and en fit at 375px without wrapping past 2 lines |
+| error | ⊘ dismissed | No error variant — a failed poll leaves the previous list intact rather than falling back to empty |
+| populated | ⊘ dismissed | Mutually exclusive with rows by construction |
+| partial | ⊘ dismissed | Fixed content, no data interpolation |
+| overflow | ⊘ dismissed | Fixed short content (icon + 2 lines) — always fits |
+| zero-one-many | ⊘ dismissed | Singleton |
+
+### E5 — Notification list scroll region
+
+| Category | Status | Resolution / Reason |
+|----------|--------|---------------------|
+| empty | ✅ covered | Renders the empty state instead of rows |
+| loading | ✅ covered | Never (D-15) |
+| error | ✅ covered | Network errors ignored and retried next tick; 401 clears `localStorage` and redirects to `/` (D-17) |
+| populated | ✅ covered | Rows newest-first (D-06) with `divide-y divide-border` between them |
+| overflow | ✅ covered | Max-height + `overflow-y-auto overscroll-contain` + `tabIndex={0}` for keyboard scroll. No pagination, no `limit` param; growth is bounded by the 30-day sweep (D-07). |
+| zero-one-many | ✅ covered | One row renders with no divider; many rows get dividers between only; scroll engages solely past the max height |
+| long-text | ✅ covered | Inherited from the E3 row contract |
+| partial | ⊘ dismissed | One fetch returns the whole list — there is no paginated or partial load |
+
+### Cross-cutting (not in the probe taxonomy)
+
+| Concern | Status | Resolution |
+|---------|--------|------------|
+| interaction-dismiss | ✅ covered | Escape, outside `pointerdown`, `focusout` past the wrapper, and toggling the heart all close the panel and return focus to the trigger; no focus trap |
+
+---
+
+## FLAGS (non-blocking)
+
+Findings from the review pass. None block planning; all three should reach the planner.
+
+| # | Flag | Detail |
+|---|------|--------|
+| F-01 | Dot visibility formula was implied, not stated | Now written explicitly as `showDot = unreadCount > 0 && !panelOpen` in Interaction Contracts § "Dot appears". Without the second term the optimistic clear and the 30s poll fight over the dot. |
+| F-02 | `position: fixed` containing-block trap | The mobile panel is `fixed` inside a `relative` wrapper. Correct today, but a `transform` on any **ancestor** would silently re-anchor it. Noted inline in the panel positioning section; the bounce is deliberately on a sibling `motion.span`. |
+| F-03 | `recipient_name` remains uncapped at 100 | `MessageCard.jsx:66` allows a 100-character name, now the larger of the two contributors to sentence length. The title cap fixes the creator side only. **Awaiting a user decision** — see the open question at the end of the ui-phase run. |
 
 ---
 
@@ -489,16 +621,33 @@ What this phase inherits unchanged versus what it adds — for the auditor.
 | Top bar (`h-16`, white, `border-b`, `px-4 sm:px-8`) | Phase 1 / live `DashboardPage.jsx:86` | inherited; one child added to the right cluster |
 | `notifications` i18n namespace | — | **new** in this phase (en + zh-TW) |
 | `NotificationBell` / `NotificationPanel` / `NotificationRow` | — | **new** in this phase |
+| Character-counter pattern (`mt-1 text-right text-sm text-text-secondary`, `aria-live="polite"`) | Phase 3 `MessageCard.jsx:86-88` | inherited verbatim for the new title counter — no new tokens |
+| Invitation title 100-character cap | — | **new** — amends the Phase 2 create form and request schema (see Cross-Phase Amendment) |
 
 ---
 
 ## Checker Sign-Off
 
-- [ ] Dimension 1 Copywriting: PASS
-- [ ] Dimension 2 Visuals: PASS
-- [ ] Dimension 3 Color: PASS
-- [ ] Dimension 4 Typography: PASS
-- [ ] Dimension 5 Spacing: PASS
-- [ ] Dimension 6 Registry Safety: PASS
+**How this was verified — read this before trusting the row below.** The `gsd-ui-checker` subagent was spawned twice and returned an **empty response both times** (a harness-level failure, not a verdict). Rather than record a sign-off that never happened, the orchestrator performed the 6-dimension review inline and verified every factual claim directly against the live codebase. This is a weaker gate than an independent checker — a second opinion on the design judgment was never obtained.
 
-**Approval:** pending
+- [x] Dimension 1 Copywriting: PASS — all strings keyed in en + zh-TW; icon-only trigger has an `aria-label`; error and destructive copy explicitly N/A with per-decision justification
+- [x] Dimension 2 Visuals: PASS — focal point declared, full bell state table, concrete classes, elevation consistent with shipped Toast/Modal, reduced-motion fallbacks, non-UI expiry scoped out
+- [x] Dimension 3 Color: PASS — zero new tokens, 60/30/10 held, accent reserved list extended by 3 with explicit NOT-for, AA/AAA contrast, unread never carried by colour alone
+- [x] Dimension 4 Typography: PASS — matches Phases 2–3 verbatim (4 sizes, 2 weights), uses 2, explicitly forbids reintroducing 12px
+- [x] Dimension 5 Spacing: PASS — all layout values multiples of 4; only 2px strokes deviate, declared as an exception with Phase 3 precedent
+- [x] Dimension 6 Registry Safety: PASS — no registries, no `components.json`, no new npm dependencies
+
+**Claims verified against the live codebase (not taken from the Inheritance Ledger):**
+
+| Claim | Result |
+|-------|--------|
+| All theme tokens used already exist in `index.css` `@theme` | ✓ confirmed — `--color-cream`, `--color-accent`, `--color-text-primary`, `--color-text-secondary`, `--color-border`, `--font-sans` all present; zero additions needed |
+| `lucide-react ^1.14`, `motion ^12.38`, `react ^19.2.5`, `tailwindcss ^4.2.4` in `package.json` | ✓ confirmed |
+| `DashboardPage.jsx` top bar is `h-16 … border-b border-border bg-white px-4 sm:px-8` with a `flex items-center gap-2` right cluster | ✓ confirmed |
+| `recipient_name` / `recipient_message` nullable, `created_at` timezone-aware | ✓ confirmed in `models/notification.py` |
+| `notifications` i18n namespace does not yet exist | ✓ confirmed absent from both `en.json` and `zh-TW.json` |
+| `Toast.jsx` and `SuccessModal.jsx` both use `z-50` + `shadow-lg`, so panel `z-40` layers below | ✓ confirmed |
+| Spacing scale and typography roles match Phases 1–3 | ✓ confirmed against `01-UI-SPEC.md`, `02-UI-SPEC.md`, `03-UI-SPEC.md` |
+| "Titles are free-form with no length cap" | ✗ **confirmed as a defect** — no cap at any layer; drove the Cross-Phase Amendment |
+
+**Approval:** approved by orchestrator review, 2026-08-02. 6/6 dimensions PASS, 3 non-blocking FLAGs (F-01 to F-03). F-03 awaits a user decision.
