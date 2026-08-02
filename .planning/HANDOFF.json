@@ -1,0 +1,80 @@
+{
+  "version": "1.0",
+  "timestamp": "2026-08-02T15:03:40.441Z",
+  "phase": "4",
+  "phase_name": "Notifications & Invitation Lifecycle",
+  "phase_dir": ".planning/phases/04-notifications-invitation-lifecycle",
+  "plan": null,
+  "task": 8,
+  "total_tasks": 15,
+  "status": "paused",
+  "completed_tasks": [
+    {"id": 1, "name": "plan-phase init + closed-phase gate + argument parsing", "status": "done", "commit": null},
+    {"id": 2, "name": "Validate phase 4 against ROADMAP; resolve MVP_MODE=false, TRACER_MODE=true, REVERSIBILITY_GATES=true, granularity=standard", "status": "done", "commit": null},
+    {"id": 3, "name": "Load 04-CONTEXT.md (pre-existing, 23 locked decisions D-01..D-23)", "status": "done", "commit": null},
+    {"id": 4, "name": "Research phase 4 -> 04-RESEARCH.md (576 lines, includes ## Validation Architecture)", "status": "done", "commit": "5f71c04"},
+    {"id": 5, "name": "Create validation strategy -> 04-VALIDATION.md", "status": "done", "commit": "9f80dda"},
+    {"id": 6, "name": "Security threat model gate (ASVS L1, block_on=high) + UI gate (UI-SPEC found) + drift precheck (skipped)", "status": "done", "commit": null},
+    {"id": 7, "name": "Pattern mapping -> 04-PATTERNS.md (244 lines)", "status": "done", "commit": "94cbcab"},
+    {"id": 8, "name": "Spec-less probe fallback (step 7.95) — edge probe run, 5 applicable edges all unresolved", "status": "done", "commit": null}
+  ],
+  "remaining_tasks": [
+    {"id": 9, "name": "Step 8 / 8.5 — spawn gsd-planner in CHUNKED mode (outline run, then one short run per plan, commit each)", "status": "not_started"},
+    {"id": 10, "name": "Step 9 — handle planner return (watch for empty return; use filesystem fallback 9a)", "status": "not_started"},
+    {"id": 11, "name": "Step 10-12 — gsd-plan-checker verification + revision loop (max 3 iterations)", "status": "not_started"},
+    {"id": 12, "name": "Step 13 — requirements coverage gate (NOTF-01, NOTF-02, NOTF-03, INV-07)", "status": "not_started"},
+    {"id": 13, "name": "Step 13a — decision coverage gate (BLOCKING: every trackable D-NN in 04-CONTEXT.md must be cited by a plan)", "status": "not_started"},
+    {"id": 14, "name": "Step 13b-13d — record planning completion in STATE.md, annotate ROADMAP wave deps, commit plans", "status": "not_started"},
+    {"id": 15, "name": "Step 13e-14 — post-planning gap analysis + present final status", "status": "not_started"}
+  ],
+  "blockers": [
+    {
+      "description": "Corporate API gateway (ANTHROPIC_BASE_URL=http://orion-model.wneweb.com.tw/anthropic/, Vertex-backed) runs at ~76 output tokens/sec. A max-effort Opus 5 request producing 32k output tokens measured 423 seconds. Two consecutive gsd-phase-researcher spawns on opus died with 'Agent terminated early due to an API error: The operation timed out' and wrote nothing to disk.",
+      "type": "external",
+      "workaround": "Run the planner as opus + chunked mode (workflow.plan_chunked is now true) so each agent run is short and each plan commits individually. For non-critical agents, spawn on sonnet. ALWAYS check the filesystem before treating an empty Agent return as failure — sonnet agents completed their work on disk twice while returning nothing."
+    },
+    {
+      "description": "WR-007 (carried from Phase 3): test_verify_correct_password and test_respond_creates_notification are empty stubs — see 03-01-SUMMARY.md:14. Needs test DB fixture infrastructure.",
+      "type": "technical",
+      "workaround": "04-RESEARCH.md § Code Examples contains the db_session transaction-rollback fixture that unblocks these. 04-VALIDATION.md Wave 0 already lists unstubbing them as a task."
+    },
+    {
+      "description": "WebSearch is blocked by org policy for this model in this environment ('web_search feature disallowed'). WebFetch fails for some domains through the proxy (docs.claude.com and docs.railway.com return http=000 / 'Socket is closed') but succeeds against the PyPI JSON API.",
+      "type": "external",
+      "workaround": "04-RESEARCH.md verified apscheduler 3.11.3 via WebFetch to pypi.org and honestly flagged which claims are unverified training knowledge (see its Sources § Tertiary and Open Question 1). Re-verify the APScheduler and Postgres advisory-lock patterns during Wave 0 if egress improves."
+    }
+  ],
+  "async_jobs": [],
+  "human_actions_pending": [
+    {
+      "action": "Optionally add \"API_TIMEOUT_MS\": \"1800000\" to the env block of ~/.claude/settings.json, and/or lower CLAUDE_EFFORT from max",
+      "context": "API_TIMEOUT_MS is currently unset (default). CLAUDE_EFFORT=max is set as an environment variable and overrides settings.json effortLevel: \"high\". Neither was changed this session — both require a session restart to take effect. Not blocking: chunked mode is the in-session mitigation.",
+      "blocking": false
+    },
+    {
+      "action": "Consider rotating ANTHROPIC_AUTH_TOKEN",
+      "context": "The token was printed in full to the terminal once while diagnosing the gateway. It stayed local to the user's own session and was not transmitted anywhere, so this is precautionary only.",
+      "blocking": false
+    }
+  ],
+  "decisions": [
+    {
+      "decision": "Run the Phase 4 planner as opus + chunked mode",
+      "rationale": "Chunked mode splits one long planner run into a short outline run plus one short run per plan, committing each plan individually. On a ~76 tok/s gateway this keeps every agent run inside the timeout window and makes a crash resumable from the last committed plan, while keeping opus-level planning quality. Recorded operationally as workflow.plan_chunked=true in .planning/config.json.",
+      "phase": "4"
+    },
+    {
+      "decision": "Ran the Phase 4 researcher and pattern-mapper on sonnet instead of the configured opus",
+      "rationale": "Two opus spawns timed out with zero output. Sonnet completed both. This is a per-spawn deviation for this session only — researcher_model in config remains opus.",
+      "phase": "4"
+    },
+    {
+      "decision": "Diagnosed the API failures as gateway throughput, not proxy misconfiguration",
+      "rationale": "NO_PROXY correctly covers .wneweb.com.tw so the API host bypasses the squid proxy; connect=0.128s; SSE is passed through unbuffered (TTFB 0.32-0.43s), ruling out the common Nginx proxy_buffering fault. The gateway simply runs slowly and long agent turns exceed the client request timeout.",
+      "phase": "4"
+    }
+  ],
+  "uncommitted_files": [".planning/config.json"],
+  "next_action": "Re-run /gsd-plan-phase 4. It will detect has_research=true and has_context=true, skip straight past research, and enter Step 8.5 chunked planning automatically because workflow.plan_chunked is now true. Do NOT let it spawn a single long-lived opus planner.",
+  "context_notes": "This is a paused PLANNING workflow, not paused execution — no Phase 4 code exists yet and no PLAN.md files have been written. The task/total_tasks numbers above map to /gsd-plan-phase workflow steps, not to plan tasks. Steps 1 through 7.95 are complete and every artifact they produce is committed. The single remaining unknown is the planner run itself. Most of this session was spent diagnosing why opus subagents kept timing out; that diagnosis is now recorded in .planning/HANDOFF.json blockers, in the user's project memory, and operationally in workflow.plan_chunked. The edge-probe output from step 7.95 is NOT persisted to disk — it is deterministic and will be regenerated identically on the next run from the same four requirement IDs, so nothing is lost."
+}
