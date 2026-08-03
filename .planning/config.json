@@ -45,11 +45,15 @@
     "source_grounding": true
   },
   "model_overrides": {
-    "gsd-phase-researcher": "sonnet"
+    "gsd-phase-researcher": "sonnet",
+    "gsd-pattern-mapper": "haiku"
   },
   "effort": {
     "agent_overrides": {
       "gsd-phase-researcher": "high"
     }
+  },
+  "models": {
+    "planning": "inherit"
   }
 }
