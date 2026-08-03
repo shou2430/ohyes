@@ -1,5 +1,5 @@
 {
-  "model_profile": "quality",
+  "model_profile": "adaptive",
   "commit_docs": true,
   "parallelization": true,
   "search_gitignored": false,
@@ -29,7 +29,8 @@
     "code_review": true,
     "code_review_depth": "standard",
     "_auto_chain_active": false,
-    "plan_chunked": true
+    "plan_chunked": true,
+    "pattern_mapper": true
   },
   "hooks": {
     "context_warnings": true
@@ -39,5 +40,16 @@
   "agent_skills": {},
   "mode": "interactive",
   "granularity": "standard",
-  "response_language": "繁體中文"
+  "response_language": "繁體中文",
+  "plan_review": {
+    "source_grounding": true
+  },
+  "model_overrides": {
+    "gsd-phase-researcher": "sonnet"
+  },
+  "effort": {
+    "agent_overrides": {
+      "gsd-phase-researcher": "high"
+    }
+  }
 }
