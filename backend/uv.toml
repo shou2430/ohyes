@@ -1,0 +1,15 @@
+# Project-level index override.
+#
+# The global ~/.config/uv/uv.toml sets the corporate Nexus mirror
+# (http://dmis-nexus.wneweb.com.tw:8081) as the default index. That host is on
+# the internal corporate network and is NOT reachable from Railway's build
+# servers, so a uv.lock pinned to Nexus URLs would break the Docker build
+# (Dockerfile runs `uv sync --frozen`).
+#
+# Pinning pypi.org as this project's default index keeps uv.lock portable:
+# local dev, CI, and Railway all resolve from the same public index, and
+# `uv add` / `uv sync` will not rewrite the lock to internal URLs.
+[[index]]
+name = "pypi"
+url = "https://pypi.org/simple"
+default = true
