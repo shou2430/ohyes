@@ -5,6 +5,7 @@ import { Link, useNavigate } from "react-router";
 import { useAuth } from "../context/AuthContext";
 import InvitationCard from "../components/InvitationCard";
 import LoadingSpinner from "../components/LoadingSpinner";
+import NotificationBell from "../components/NotificationBell";
 import Toast from "../components/Toast";
 
 const API_URL = import.meta.env.VITE_API_URL || "";
@@ -17,6 +18,7 @@ export default function DashboardPage() {
   const [invitations, setInvitations] = useState([]);
   const [loading, setLoading] = useState(true);
   const [toast, setToast] = useState(null);
+  const [notifications, setNotifications] = useState([]);
 
   // Set page title per UI spec
   useEffect(() => {
@@ -42,6 +44,27 @@ export default function DashboardPage() {
     }
     fetchInvitations();
   }, [t]);
+
+  // Fetch notifications on mount. A separate effect from the invitations
+  // fetch so one failing request never suppresses the other surface. On
+  // failure, leave notifications at its previous value and show nothing —
+  // the bell is a background surface, not one the creator asked to refresh.
+  useEffect(() => {
+    async function fetchNotifications() {
+      try {
+        const token = localStorage.getItem("ohyes_token");
+        const res = await fetch(`${API_URL}/api/notifications`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        if (res.ok) {
+          setNotifications(await res.json());
+        }
+      } catch {
+        // Silent — no toast, no error text (E1/E2 error contract).
+      }
+    }
+    fetchNotifications();
+  }, []);
 
   const handleLogout = async () => {
     await logout();
@@ -88,6 +111,7 @@ export default function DashboardPage() {
           {t("app.name")}
         </span>
         <div className="flex items-center gap-2">
+          <NotificationBell notifications={notifications} />
           {user?.avatar_url ? (
             <img
               src={user.avatar_url}
