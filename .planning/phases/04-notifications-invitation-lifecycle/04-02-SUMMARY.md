@@ -184,3 +184,20 @@ None - no external service configuration required.
 ---
 *Phase: 04-notifications-invitation-lifecycle*
 *Completed: 2026-08-12*
+
+## Self-Check: PASSED
+
+All created files found on disk:
+- `backend/app/schemas/notification.py`
+- `backend/app/routers/notifications.py`
+- `frontend/src/components/NotificationBell.jsx`
+- `frontend/src/components/NotificationPanel.jsx`
+- `frontend/src/components/NotificationRow.jsx`
+- `.planning/phases/04-notifications-invitation-lifecycle/04-02-SUMMARY.md`
+- `.planning/phases/04-notifications-invitation-lifecycle/deferred-items.md`
+
+All commit hashes found in `git log`:
+- `3bac290` (Task 1)
+- `993e2f2` (Task 2)
+- `f8ea21c` (Task 3)
+- `8509930` (SUMMARY doc commit)
