@@ -5,13 +5,13 @@ milestone_name: v1 Launch
 current_phase: 4
 current_phase_name: Notifications & Invitation Lifecycle
 status: executing
-stopped_at: Completed 04-01-PLAN.md (Wave 0 test harness)
-last_updated: "2026-08-12T10:25:47.392Z"
+stopped_at: Completed 04-02-PLAN.md
+last_updated: "2026-08-12T10:41:42.455Z"
 progress:
   total_phases: 4
   completed_phases: 3
   total_plans: 17
-  completed_plans: 11
+  completed_plans: 12
 ---
 
 # Project State: OhYes
@@ -37,7 +37,7 @@ See: .planning/PROJECT.md
 | 1 | Foundation & Authentication | Complete (2026-05-09) | 6/6 |
 | 2 | Invitation Creation & Management | Complete (2026-05-09) | 2/2 |
 | 3 | Recipient Experience | Complete (2026-07-30) | 2/2 |
-| 4 | Notifications & Invitation Lifecycle | Executing (2026-08-12) | 1/4 |
+| 4 | Notifications & Invitation Lifecycle | Executing (2026-08-12) | 2/4 |
 | 5 | Internationalization & Responsive Polish | Pending | 0/0 |
 
 ## Recent Decisions
@@ -76,8 +76,8 @@ See: .planning/PROJECT.md
 
 **Resume file:** None
 
-Last session: 2026-08-12T10:25:47.292Z
-Stopped at: Completed 04-01-PLAN.md (Wave 0 test harness)
+Last session: 2026-08-12T10:41:42.345Z
+Stopped at: Completed 04-02-PLAN.md
 Next action: `/gsd-execute-phase 4` (start throwaway docker PG + backend/.env first — see Human Actions #1)
 
 ---
@@ -86,9 +86,11 @@ Next action: `/gsd-execute-phase 4` (start throwaway docker PG + backend/.env fi
 ## Decisions
 
 - [Phase 4]: Phase 4 Plan 01 (Wave 0 harness): db_session rollback fixture confirmed to hold across two full-suite runs (assumption A4); AsyncIOScheduler bare-coroutine-job behavior confirmed by passing test (Open Question 1); apscheduler 3.11.3 approved and pinned
+- [Phase 4]: Phase 4 Plan 02 (tracer): GET /api/notifications owner-scoped no-pagination endpoint, NotificationResponse schema, and NotificationBell/Panel/Row components landed; full browser/OAuth visual confirmation deferred to human verifier (A-02-1); title/name cap amendment (A-02-2) still not landed
 
 ## Performance Metrics
 
 | Plan | Duration | Tasks | Files |
 |------|----------|-------|-------|
 | Phase 04 P01 | 20min | 5 tasks | 7 files |
+| Phase 04 P02 | 45min | 3 tasks | 10 files |

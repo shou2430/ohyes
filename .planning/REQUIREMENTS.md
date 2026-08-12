@@ -36,8 +36,8 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Notification
 
-- [ ] **NOTF-01**: Creator sees red dot/heart indicator when a notification arrives
-- [ ] **NOTF-02**: Notification shows "[Name] said yes to your [title]" with optional message
+- [x] **NOTF-01**: Creator sees red dot/heart indicator when a notification arrives
+- [x] **NOTF-02**: Notification shows "[Name] said yes to your [title]" with optional message
 - [ ] **NOTF-03**: Creator can mark notifications as read
 
 ### UI/UX
@@ -113,8 +113,8 @@ Which phases cover which requirements. Updated during roadmap creation.
 | RCPT-06 | Phase 3 | Pending |
 | RCPT-07 | Phase 3 | Pending |
 | RCPT-08 | Phase 3 | Pending |
-| NOTF-01 | Phase 4 | Pending |
-| NOTF-02 | Phase 4 | Pending |
+| NOTF-01 | Phase 4 | Complete |
+| NOTF-02 | Phase 4 | Complete |
 | NOTF-03 | Phase 4 | Pending |
 | UI-01 | Phase 5 | Pending |
 | UI-02 | Phase 5 | Pending |
@@ -123,6 +123,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | INFR-02 | Phase 1 | Complete |
 
 **Coverage:**
+
 - v1 requirements: 26 total
 - Mapped to phases: 26
 - Unmapped: 0 ✓
