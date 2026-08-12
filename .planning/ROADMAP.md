@@ -15,6 +15,7 @@
 **Depends on:** none
 
 **Success Criteria:**
+
 1. User can click "Sign in with Google" and land on an authenticated dashboard shell
 2. User can refresh the page and remain logged in (session persists)
 3. User can log out and is returned to the public landing page
@@ -28,10 +29,12 @@
 **Depends on:** Phase 1
 
 **Plans:**
+
 - [x] Plan 01: Backend — Invitation Model, Photo Pipeline, and API Endpoints (2026-05-09)
 - [x] Plan 02: Frontend — Creation Form, Dashboard Cards, and Recipient Gate (2026-05-09)
 
 **Success Criteria:**
+
 1. User can create an invitation with a custom title, uploaded photo, and 4-8 character password and receive a unique shareable URL
 2. User sees their active invitations listed on the dashboard and can delete any of them
 3. User attempting to create a third invitation is blocked with a clear limit message
@@ -45,6 +48,7 @@
 **Depends on:** Phase 2
 
 **Success Criteria:**
+
 1. Recipient enters the correct password and sees the personalized page with title, photo, Yes button, and No button
 2. No button dodges the cursor/finger with escalating intensity, leaves visual trail effects, and a dodge counter is visible
 3. Clicking Yes triggers a celebration animation and prompts recipient for their name and a short message
@@ -58,6 +62,7 @@
 **Depends on:** Phase 3
 
 **Success Criteria:**
+
 1. Creator sees a red dot/heart indicator on the dashboard when a new notification arrives
 2. Notification displays "[Name] said yes to your [title]" with the recipient's optional message
 3. Creator can mark notifications as read and the indicator clears
@@ -71,6 +76,7 @@
 **Depends on:** Phase 4
 
 **Success Criteria:**
+
 1. App defaults to Traditional Chinese and all user-facing text renders correctly in zh-TW
 2. User can toggle to English and all text switches without page reload
 3. All pages are usable on mobile viewports (375px+) with touch-friendly tap targets

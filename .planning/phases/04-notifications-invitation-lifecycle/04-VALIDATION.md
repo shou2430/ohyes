@@ -5,7 +5,7 @@ slug: notifications-invitation-lifecycle
 # audit-milestone §5.5 distinguishes NOT-VALIDATED (draft) from PARTIAL (validated + nyquist_compliant: false) (#2117)
 status: draft
 nyquist_compliant: false
-wave_0_complete: false
+wave_0_complete: true
 created: 2026-08-02
 ---
 
@@ -26,7 +26,7 @@ created: 2026-08-02
 | **Config file** | `backend/pyproject.toml` (`[tool.pytest.ini_options]`) |
 | **Quick run command** | `cd backend && uv run pytest tests/test_notifications.py tests/test_cleanup.py -x` |
 | **Full suite command** | `cd backend && uv run pytest` |
-| **Estimated runtime** | ~15 seconds (quick) / ~45 seconds (full) — re-measure after Wave 0 |
+| **Estimated runtime** | ~0.3s (quick) / ~0.5s (full) — measured after Wave 0 (04-01) |
 
 ---
 
@@ -46,13 +46,13 @@ granularity from `04-RESEARCH.md` § Validation Architecture → Phase Requireme
 
 | Task ID | Plan | Wave | Requirement | Threat Ref | Secure Behavior | Test Type | Automated Command | File Exists | Status |
 |---------|------|------|-------------|------------|-----------------|-----------|-------------------|-------------|--------|
-| TBD | TBD | 0 | (infra) | — | N/A | fixture | `cd backend && uv run pytest tests/ -x --collect-only` | ❌ W0 | ⬜ pending |
-| TBD | TBD | TBD | NOTF-01 | — | N/A | unit | `cd backend && uv run pytest tests/test_notifications.py::test_list_returns_unread -x` | ❌ W0 | ⬜ pending |
-| TBD | TBD | TBD | NOTF-02 | T-4-IDOR | Every query filtered by `Notification.user_id == current_user.id`; `user_id` never accepted from request | unit | `cd backend && uv run pytest tests/test_notifications.py::test_list_scoped_to_owner -x` | ❌ W0 | ⬜ pending |
-| TBD | TBD | TBD | NOTF-03 | T-4-IDOR | Mark-read affects only the authenticated user's rows | unit | `cd backend && uv run pytest tests/test_notifications.py::test_mark_all_read -x` | ❌ W0 | ⬜ pending |
-| TBD | TBD | TBD | INV-07 | T-4-SILENT | Sweep deletes expired invitations + photo file; logs run start / rows deleted / lock skip so a stuck scheduler is observable | unit | `cd backend && uv run pytest tests/test_cleanup.py::test_sweep_deletes_expired_invitation_and_photo -x` | ❌ W0 | ⬜ pending |
-| TBD | TBD | TBD | INV-07 | T-4-LOCKKEY | Transaction-scoped advisory lock with a distinctive documented key prevents concurrent double-sweep | unit | `cd backend && uv run pytest tests/test_cleanup.py::test_advisory_lock_blocks_concurrent_run -x` | ❌ W0 | ⬜ pending |
-| TBD | TBD | TBD | (WR-007 debt) | — | N/A | integration | `cd backend && uv run pytest tests/test_invitation_respond.py::test_respond_creates_notification_and_deletes_invitation -x` | ✅ stub exists, needs fixture | ⬜ pending |
+| 04-01/T1 | 04-01 | 0 | (infra) | — | N/A | fixture | `cd backend && uv run pytest tests/ -x --collect-only` | ✅ | ✅ green |
+| 04-01/T3 | 04-01 | 0 | NOTF-01 | — | N/A | unit | `cd backend && uv run pytest tests/test_notifications.py::test_list_returns_unread -x` | ✅ | ⬜ pending (xfail scaffold; 04-02 implements) |
+| 04-01/T3 | 04-01 | 0 | NOTF-02 | T-4-IDOR | Every query filtered by `Notification.user_id == current_user.id`; `user_id` never accepted from request | unit | `cd backend && uv run pytest tests/test_notifications.py::test_list_scoped_to_owner -x` | ✅ | ⬜ pending (xfail scaffold; 04-02 implements) |
+| 04-01/T3 | 04-01 | 0 | NOTF-03 | T-4-IDOR | Mark-read affects only the authenticated user's rows | unit | `cd backend && uv run pytest tests/test_notifications.py::test_mark_all_read -x` | ✅ | ⬜ pending (xfail scaffold; 04-03 implements) |
+| 04-01/T5 | 04-01 | 0 | INV-07 | T-4-SILENT | Sweep deletes expired invitations + photo file; logs run start / rows deleted / lock skip so a stuck scheduler is observable | unit | `cd backend && uv run pytest tests/test_cleanup.py::test_sweep_deletes_expired_invitation_and_photo -x` | ✅ | ⬜ pending (xfail scaffold; 04-04 implements) |
+| 04-01/T5 | 04-01 | 0 | INV-07 | T-4-LOCKKEY | Transaction-scoped advisory lock with a distinctive documented key prevents concurrent double-sweep | unit | `cd backend && uv run pytest tests/test_cleanup.py::test_advisory_lock_blocks_concurrent_run -x` | ✅ | ⬜ pending (xfail scaffold; 04-04 implements) |
+| 04-01/T2 | 04-01 | 0 | (WR-007 debt) | — | N/A | integration | `cd backend && uv run pytest tests/test_invitation_respond.py::test_respond_creates_notification_and_deletes_invitation -x` | ✅ | ✅ green |
 
 *Status: ⬜ pending · ✅ green · ❌ red · ⚠️ flaky*
 
@@ -60,12 +60,12 @@ granularity from `04-RESEARCH.md` § Validation Architecture → Phase Requireme
 
 ## Wave 0 Requirements
 
-- [ ] `backend/tests/conftest.py` — add the `db_session` transaction-rollback fixture (see `04-RESEARCH.md` § Code Examples) so seeded-row tests don't pollute each other
-- [ ] `backend/tests/test_notifications.py` — new file covering NOTF-01 / NOTF-02 / NOTF-03
-- [ ] `backend/tests/test_cleanup.py` — new file covering INV-07 sweep logic + advisory lock behavior
-- [ ] Unstub `test_respond_creates_notification_and_deletes_invitation` and `test_verify_correct_password_returns_200` (WR-007 debt) using the new fixture
-- [ ] `cd backend && uv add apscheduler` — the one new dependency this phase introduces (verified live on PyPI: 3.11.3, published 2026-06-28)
-- [ ] Smoke-test APScheduler coroutine jobs before wiring real cleanup logic (resolves RESEARCH Open Question 1): register `add_job(..., "interval", seconds=2)` in a scratch script and confirm it fires via a log line
+- [x] `backend/tests/conftest.py` — add the `db_session` transaction-rollback fixture (see `04-RESEARCH.md` § Code Examples) so seeded-row tests don't pollute each other
+- [x] `backend/tests/test_notifications.py` — new file covering NOTF-01 / NOTF-02 / NOTF-03
+- [x] `backend/tests/test_cleanup.py` — new file covering INV-07 sweep logic + advisory lock behavior
+- [x] Unstub `test_respond_creates_notification_and_deletes_invitation` and `test_verify_correct_password_returns_200` (WR-007 debt) using the new fixture
+- [x] `cd backend && uv add apscheduler` — the one new dependency this phase introduces (resolved 3.11.3, human legitimacy checkpoint approved)
+- [x] Smoke-test APScheduler coroutine jobs before wiring real cleanup logic (resolves RESEARCH Open Question 1) — `test_asyncio_scheduler_runs_coroutine_job` passes: a bare `async def` job is accepted directly and fires on the running loop
 
 ---
 

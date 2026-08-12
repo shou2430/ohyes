@@ -4,14 +4,14 @@ milestone: v1.0
 milestone_name: v1 Launch
 current_phase: 4
 current_phase_name: Notifications & Invitation Lifecycle
-status: planned
-stopped_at: Phase 4 planned — 4 plans, ready to execute
-last_updated: "2026-08-12T09:51:15Z"
+status: executing
+stopped_at: Completed 04-01-PLAN.md (Wave 0 test harness)
+last_updated: "2026-08-12T10:25:47.392Z"
 progress:
-  total_phases: 5
+  total_phases: 4
   completed_phases: 3
-  total_plans: 14
-  completed_plans: 10
+  total_plans: 17
+  completed_plans: 11
 ---
 
 # Project State: OhYes
@@ -20,7 +20,7 @@ progress:
 
 **Milestone:** 1 (v1 Launch)
 **Phase:** 4 — Notifications & Invitation Lifecycle
-**Status:** Planned — 4 plans across 2 waves, ready to execute
+**Status:** Executing Phase 04
 **Overall:** 3/5 phases complete
 
 ## Project Reference
@@ -28,7 +28,7 @@ progress:
 See: .planning/PROJECT.md
 
 **Core value:** The moment of delight when someone sees a personalized page made just for them and realizes they can't say no — literally.
-**Current focus:** Phase 04 — Notifications & Invitation Lifecycle
+**Current focus:** Phase 04 — notifications-invitation-lifecycle
 
 ## Phase Status
 
@@ -37,7 +37,7 @@ See: .planning/PROJECT.md
 | 1 | Foundation & Authentication | Complete (2026-05-09) | 6/6 |
 | 2 | Invitation Creation & Management | Complete (2026-05-09) | 2/2 |
 | 3 | Recipient Experience | Complete (2026-07-30) | 2/2 |
-| 4 | Notifications & Invitation Lifecycle | Planned (2026-08-12) | 0/4 |
+| 4 | Notifications & Invitation Lifecycle | Executing (2026-08-12) | 1/4 |
 | 5 | Internationalization & Responsive Polish | Pending | 0/0 |
 
 ## Recent Decisions
@@ -74,9 +74,21 @@ See: .planning/PROJECT.md
 
 ## Session Continuity
 
-Last session: 2026-08-12T09:51:15Z
-Stopped at: Phase 4 planning finalized — all post-planning gates passed (requirements 4/4, decision coverage 23/23), STATE + ROADMAP updated, plans committed
+**Resume file:** None
+
+Last session: 2026-08-12T10:25:47.292Z
+Stopped at: Completed 04-01-PLAN.md (Wave 0 test harness)
 Next action: `/gsd-execute-phase 4` (start throwaway docker PG + backend/.env first — see Human Actions #1)
 
 ---
 *Last updated: 2026-08-12 on session resume*
+
+## Decisions
+
+- [Phase 4]: Phase 4 Plan 01 (Wave 0 harness): db_session rollback fixture confirmed to hold across two full-suite runs (assumption A4); AsyncIOScheduler bare-coroutine-job behavior confirmed by passing test (Open Question 1); apscheduler 3.11.3 approved and pinned
+
+## Performance Metrics
+
+| Plan | Duration | Tasks | Files |
+|------|----------|-------|-------|
+| Phase 04 P01 | 20min | 5 tasks | 7 files |
