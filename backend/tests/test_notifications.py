@@ -5,8 +5,6 @@ from sqlalchemy import select
 
 from app.models.notification import Notification
 
-XFAIL_REASON = "GET/POST /api/notifications land in 04-02 and 04-03"
-
 
 @pytest.mark.asyncio
 async def test_list_returns_unread(client, db_session, seeded_user, auth_headers):
@@ -83,7 +81,6 @@ async def test_list_scoped_to_owner(
 
 
 @pytest.mark.asyncio
-@pytest.mark.xfail(reason=XFAIL_REASON, strict=True)
 async def test_mark_all_read(
     client, db_session, seeded_user, second_user, auth_headers
 ):
@@ -118,6 +115,7 @@ async def test_mark_all_read(
 
     response = await client.post("/api/notifications/read", headers=auth_headers)
     assert response.status_code == 200
+    assert response.json() == {"updated": 2}
 
     result = await db_session.execute(
         select(Notification).where(Notification.user_id == seeded_user.id)
@@ -130,3 +128,51 @@ async def test_mark_all_read(
     )
     other = result.scalar_one()
     assert other.is_read is False
+
+    # Subsequent GET reflects the flip for every one of the caller's rows.
+    list_response = await client.get("/api/notifications", headers=auth_headers)
+    assert list_response.status_code == 200
+    assert all(item["is_read"] is True for item in list_response.json())
+
+
+@pytest.mark.asyncio
+async def test_mark_all_read_scoped_to_owner(
+    client, db_session, seeded_user, second_user, auth_headers, second_auth_headers
+):
+    """NOTF-03 (T-04-IDOR): user A's mark-read call never touches user B's rows."""
+    now = datetime.now(timezone.utc)
+    owner_a_notification = Notification(
+        user_id=seeded_user.id,
+        invitation_title="Owner A title",
+        recipient_name="Amy",
+        recipient_message="Yes!",
+        is_read=False,
+        created_at=now,
+    )
+    owner_b_notification = Notification(
+        user_id=second_user.id,
+        invitation_title="Owner B title",
+        recipient_name="Bo",
+        recipient_message="Sure!",
+        is_read=False,
+        created_at=now,
+    )
+    db_session.add_all([owner_a_notification, owner_b_notification])
+    await db_session.flush()
+
+    response = await client.post("/api/notifications/read", headers=auth_headers)
+    assert response.status_code == 200
+    assert response.json() == {"updated": 1}
+
+    result_b = await db_session.execute(
+        select(Notification).where(Notification.user_id == second_user.id)
+    )
+    owner_b_row = result_b.scalar_one()
+    assert owner_b_row.is_read is False
+
+    # Confirm via user B's own authenticated view too.
+    list_response_b = await client.get(
+        "/api/notifications", headers=second_auth_headers
+    )
+    assert list_response_b.status_code == 200
+    assert all(item["is_read"] is False for item in list_response_b.json())
