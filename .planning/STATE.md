@@ -66,7 +66,7 @@ See: .planning/PROJECT.md
 
 ## Human Actions Pending
 
-1. **Before executing Phase 4 (blocking for execution):** start a throwaway local PostgreSQL 16 and create `backend/.env` from `backend/.env.example` with `DATABASE_URL` pointing at the LOCAL db — `docker run -d --name ohyes-pg -e POSTGRES_PASSWORD=postgres -e POSTGRES_DB=ohyes -p 5432:5432 postgres:16`. 04-01 (wave 0) runs `alembic upgrade head` + pytest and needs it. NEVER point at Railway prod.
+1. ✅ **DONE (2026-08-12):** throwaway `ohyes-pg` (postgres:16) is running on localhost:5432 and `backend/.env` exists (git-ignored, DATABASE_URL → local). `alembic upgrade head` succeeded — users/invitations/notifications tables created. If the container was stopped since (reboot), restart with `docker start ohyes-pg`. To reset: `docker rm -f ohyes-pg` then re-run the `docker run` from the create step. NEVER point DATABASE_URL at Railway prod.
 2. Confirm the 30-day notification retention window at the 04-04 Task 2 checkpoint (blocking `checkpoint:decision`). D-07 is one-way. First-run backup is NOT needed while prod holds only test data — becomes a launch-checklist item once real recipients exist.
 3. Complete the 11 manual UAT items in 03-VERIFICATION.md (`/gsd-verify-work 3`) — non-blocking
 4. Re-test the recipient page on the deployed app; Phase 3 fixes (12024ae, 31fa71a, 4a3da61, 824fc9d) are unconfirmed live — non-blocking
