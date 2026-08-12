@@ -9,7 +9,6 @@ XFAIL_REASON = "GET/POST /api/notifications land in 04-02 and 04-03"
 
 
 @pytest.mark.asyncio
-@pytest.mark.xfail(reason=XFAIL_REASON, strict=True)
 async def test_list_returns_unread(client, db_session, seeded_user, auth_headers):
     """NOTF-01: GET /api/notifications reports is_read flags, newest first."""
     now = datetime.now(timezone.utc)
@@ -44,7 +43,6 @@ async def test_list_returns_unread(client, db_session, seeded_user, auth_headers
 
 
 @pytest.mark.asyncio
-@pytest.mark.xfail(reason=XFAIL_REASON, strict=True)
 async def test_list_scoped_to_owner(
     client, db_session, seeded_user, second_user, auth_headers, second_auth_headers
 ):

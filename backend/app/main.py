@@ -9,6 +9,7 @@ from app.core.config import settings
 from app.routers.auth import router as auth_router
 from app.routers.health import router as health_router
 from app.routers.invitations import router as invitations_router
+from app.routers.notifications import router as notifications_router
 from app.routers.photos import router as photos_router
 
 
@@ -37,6 +38,7 @@ app.include_router(health_router)
 app.include_router(auth_router)
 app.include_router(invitations_router)
 app.include_router(photos_router)
+app.include_router(notifications_router)
 
 
 @app.get("/")
