@@ -45,10 +45,14 @@ export default function DashboardPage() {
     fetchInvitations();
   }, [t]);
 
-  // Fetch notifications on mount. A separate effect from the invitations
-  // fetch so one failing request never suppresses the other surface. On
-  // failure, leave notifications at its previous value and show nothing —
-  // the bell is a background surface, not one the creator asked to refresh.
+  // Poll notifications every 30s (D-13) while the dashboard is mounted
+  // (D-14). A separate effect from the invitations fetch so one failing
+  // request never suppresses the other surface. On failure, leave
+  // notifications at its previous value and show nothing — the bell is a
+  // background surface, not one the creator asked to refresh (D-15). A 401
+  // clears the stored token and redirects to the landing page (D-17, Phase
+  // 1 D-03); a network error is swallowed and retried on the next tick, with
+  // no backoff and no circuit breaker (D-17).
   useEffect(() => {
     async function fetchNotifications() {
       try {
@@ -58,13 +62,36 @@ export default function DashboardPage() {
         });
         if (res.ok) {
           setNotifications(await res.json());
+        } else if (res.status === 401) {
+          localStorage.removeItem("ohyes_token");
+          navigate("/");
         }
       } catch {
-        // Silent — no toast, no error text (E1/E2 error contract).
+        // Silent — no toast, no error text (E1/E2 error contract). The next
+        // 30s tick retries automatically.
       }
     }
     fetchNotifications();
-  }, []);
+    const intervalId = setInterval(fetchNotifications, 30000);
+    return () => clearInterval(intervalId);
+  }, [navigate]);
+
+  // Opening the panel marks everything read in one call (D-08). Optimistic:
+  // flip is_read locally first, then fire the request; a failure is
+  // swallowed with no revert and no toast (D-10) — the server remains the
+  // source of truth and the dot self-heals on the next poll.
+  const handleMarkNotificationsRead = async () => {
+    setNotifications((prev) => prev.map((n) => ({ ...n, is_read: true })));
+    try {
+      const token = localStorage.getItem("ohyes_token");
+      await fetch(`${API_URL}/api/notifications/read`, {
+        method: "POST",
+        headers: { Authorization: `Bearer ${token}` },
+      });
+    } catch {
+      // Silent — D-10.
+    }
+  };
 
   const handleLogout = async () => {
     await logout();
@@ -111,7 +138,10 @@ export default function DashboardPage() {
           {t("app.name")}
         </span>
         <div className="flex items-center gap-2">
-          <NotificationBell notifications={notifications} />
+          <NotificationBell
+            notifications={notifications}
+            onMarkRead={handleMarkNotificationsRead}
+          />
           {user?.avatar_url ? (
             <img
               src={user.avatar_url}
