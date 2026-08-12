@@ -82,5 +82,16 @@
   "errors": {
     "signInFailed": "登入失敗，請再試一次。",
     "network": "發生錯誤，請再試一次。"
+  },
+  "notifications": {
+    "title": "通知",
+    "ariaLabel": "通知，{{unread}} 則未讀",
+    "ariaLabelNone": "通知",
+    "saidYes": "{{name}} 對你的「{{title}}」說了 Yes",
+    "saidYesAnonymous": "有人對你的「{{title}}」說了 Yes",
+    "newLabel": "新",
+    "justNow": "剛剛",
+    "emptyHeading": "還沒有新消息",
+    "emptyBody": "當有人對你說 Yes，就會出現在這裡。"
   }
 }

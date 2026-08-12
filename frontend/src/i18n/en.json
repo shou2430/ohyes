@@ -82,5 +82,16 @@
   "errors": {
     "signInFailed": "Sign-in failed. Please try again.",
     "network": "Something went wrong. Please try again."
+  },
+  "notifications": {
+    "title": "Notifications",
+    "ariaLabel": "Notifications, {{unread}} unread",
+    "ariaLabelNone": "Notifications",
+    "saidYes": "{{name}} said yes to your “{{title}}”",
+    "saidYesAnonymous": "Someone said yes to your “{{title}}”",
+    "newLabel": "New",
+    "justNow": "Just now",
+    "emptyHeading": "No news yet",
+    "emptyBody": "When someone says yes, you'll see it here."
   }
 }
