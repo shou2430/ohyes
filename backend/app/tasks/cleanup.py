@@ -9,7 +9,7 @@ INV-07, D-18, D-19, D-20, D-21, D-22.
 
 import logging
 import os
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 from sqlalchemy import delete, text
@@ -17,6 +17,7 @@ from sqlalchemy import delete, text
 from app.core.config import settings
 from app.core.database import async_session_factory
 from app.models.invitation import Invitation
+from app.models.notification import Notification
 
 logger = logging.getLogger(__name__)
 
@@ -25,6 +26,13 @@ logger = logging.getLogger(__name__)
 # would make pg_try_advisory_xact_lock return false forever and silently
 # stop the sweep with no error to observe.
 CLEANUP_LOCK_KEY = 727100401
+
+# Notification retention window in whole days (D-07, NOTF-V2-02). Confirmed
+# at the 04-04 Task 2 checkpoint: option id "retain-30" — 30 days, exactly
+# as locked in D-07. This is a one-way decision: deleted notification rows
+# are the only surviving copy of each recipient's message (the invitation
+# that carried it was already destroyed at respond time, Phase 3 D-10).
+NOTIFICATION_RETENTION_DAYS = 30
 
 
 async def run_cleanup() -> None:
@@ -43,14 +51,17 @@ async def run_cleanup() -> None:
             return
 
         deleted_photo_filenames = await _delete_expired_invitations(db)
+        deleted_notification_count = await _delete_old_notifications(db)
         await db.commit()  # releases the transaction-scoped advisory lock
 
         removed_photo_count = _remove_photo_files(deleted_photo_filenames)
 
         logger.info(
-            "cleanup: deleted %d invitations, removed %d photo files",
+            "cleanup: deleted %d invitations, removed %d photo files, "
+            "deleted %d notifications",
             len(deleted_photo_filenames),
             removed_photo_count,
+            deleted_notification_count,
         )
 
 
@@ -66,6 +77,15 @@ async def _delete_expired_invitations(db) -> list[str]:
     )
     result = await db.execute(stmt)
     return list(result.scalars().all())
+
+
+async def _delete_old_notifications(db) -> int:
+    """Bulk-delete notifications older than NOTIFICATION_RETENTION_DAYS.
+    Plain DELETE, no RETURNING — notification retention has no filesystem
+    side effect (D-07, D-21)."""
+    cutoff = datetime.now(timezone.utc) - timedelta(days=NOTIFICATION_RETENTION_DAYS)
+    result = await db.execute(delete(Notification).where(Notification.created_at < cutoff))
+    return result.rowcount
 
 
 def _remove_photo_files(filenames) -> int:

@@ -10,6 +10,7 @@ import app.tasks.cleanup as cleanup_module
 from app.core.config import settings
 from app.core.database import engine
 from app.models.invitation import Invitation
+from app.models.notification import Notification
 from app.tasks.cleanup import CLEANUP_LOCK_KEY, run_cleanup
 
 
@@ -149,6 +150,75 @@ async def test_sweep_tolerates_missing_photo_file(
         select(Invitation).where(Invitation.short_code == "NOFILE1")
     )
     assert result.scalar_one_or_none() is None
+
+
+@pytest.mark.asyncio
+async def test_sweep_deletes_notifications_older_than_retention(
+    db_session, seeded_user, tmp_path, monkeypatch
+):
+    """D-07/NOTF-V2-02: a notification whose created_at is older than
+    NOTIFICATION_RETENTION_DAYS (30, confirmed retain-30 at the Task 2
+    checkpoint) is absent from the notifications table after one
+    run_cleanup() call."""
+    monkeypatch.setattr(settings, "PHOTO_STORAGE_PATH", str(tmp_path))
+    monkeypatch.setattr(
+        cleanup_module, "async_session_factory", lambda: _reuse_session(db_session)
+    )
+
+    now = datetime.now(timezone.utc)
+    old_notification = Notification(
+        user_id=seeded_user.id,
+        invitation_title="Old notification",
+        recipient_name="Amy",
+        recipient_message="Yes!",
+        is_read=False,
+        created_at=now
+        - timedelta(days=cleanup_module.NOTIFICATION_RETENTION_DAYS + 1),
+    )
+    db_session.add(old_notification)
+    await db_session.flush()
+
+    await run_cleanup()
+
+    result = await db_session.execute(
+        select(Notification).where(
+            Notification.invitation_title == "Old notification"
+        )
+    )
+    assert result.scalar_one_or_none() is None
+
+
+@pytest.mark.asyncio
+async def test_sweep_keeps_recent_notifications(
+    db_session, seeded_user, tmp_path, monkeypatch
+):
+    """D-07/NOTF-V2-02: a notification created within the retention window
+    is still present after run_cleanup()."""
+    monkeypatch.setattr(settings, "PHOTO_STORAGE_PATH", str(tmp_path))
+    monkeypatch.setattr(
+        cleanup_module, "async_session_factory", lambda: _reuse_session(db_session)
+    )
+
+    now = datetime.now(timezone.utc)
+    recent_notification = Notification(
+        user_id=seeded_user.id,
+        invitation_title="Recent notification",
+        recipient_name="Bo",
+        recipient_message="Sure!",
+        is_read=False,
+        created_at=now - timedelta(hours=1),
+    )
+    db_session.add(recent_notification)
+    await db_session.flush()
+
+    await run_cleanup()
+
+    result = await db_session.execute(
+        select(Notification).where(
+            Notification.invitation_title == "Recent notification"
+        )
+    )
+    assert result.scalar_one_or_none() is not None
 
 
 @pytest.mark.asyncio
