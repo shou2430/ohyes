@@ -264,3 +264,17 @@ async def test_advisory_lock_blocks_concurrent_run(
         assert result.scalar_one_or_none() is not None
 
         await lock_conn.rollback()
+
+
+@pytest.mark.asyncio
+async def test_scheduler_registers_hourly_cleanup_job():
+    """D-18/D-20: application startup registers run_cleanup on an hourly
+    interval trigger under job id 'cleanup_sweep', and the scheduler shuts
+    down cleanly on teardown."""
+    from app.main import app as fastapi_app
+    from app.main import lifespan, scheduler
+
+    async with lifespan(fastapi_app):
+        job = scheduler.get_job("cleanup_sweep")
+        assert job is not None
+        assert job.trigger.interval == timedelta(hours=1)
