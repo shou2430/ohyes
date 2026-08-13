@@ -39,6 +39,7 @@ Requirements for initial release. Each maps to roadmap phases.
 - [x] **NOTF-01**: Creator sees red dot/heart indicator when a notification arrives
 - [x] **NOTF-02**: Notification shows "[Name] said yes to your [title]" with optional message
 - [x] **NOTF-03**: Creator can mark notifications as read
+- [x] **NOTF-V2-02**: Notifications are auto-deleted 30 days after `created_at` (pulled forward from v2 during Phase 4 discussion, D-07)
 
 ### UI/UX
 
@@ -63,7 +64,6 @@ Deferred to future release. Tracked but not in current roadmap.
 ### Notifications
 
 - **NOTF-V2-01**: Email notification when recipient says Yes
-- **NOTF-V2-02**: Notification retention policy (auto-delete after 30 days)
 
 ### Customization
 
@@ -116,6 +116,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | NOTF-01 | Phase 4 | Complete |
 | NOTF-02 | Phase 4 | Complete |
 | NOTF-03 | Phase 4 | Complete |
+| NOTF-V2-02 | Phase 4 | Complete |
 | UI-01 | Phase 5 | Pending |
 | UI-02 | Phase 5 | Pending |
 | UI-03 | Phase 5 | Pending |
@@ -124,8 +125,8 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 **Coverage:**
 
-- v1 requirements: 26 total
-- Mapped to phases: 26
+- v1 requirements: 27 total
+- Mapped to phases: 27
 - Unmapped: 0 ✓
 
 ---
