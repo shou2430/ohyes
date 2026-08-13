@@ -5,13 +5,13 @@ milestone_name: v1 Launch
 current_phase: 4
 current_phase_name: Notifications & Invitation Lifecycle
 status: executing
-stopped_at: Completed 04-03-PLAN.md
-last_updated: "2026-08-13T00:47:48.404Z"
+stopped_at: Completed 04-04-PLAN.md
+last_updated: "2026-08-13T01:08:01.939Z"
 progress:
   total_phases: 4
   completed_phases: 3
   total_plans: 17
-  completed_plans: 13
+  completed_plans: 14
 ---
 
 # Project State: OhYes
@@ -37,7 +37,7 @@ See: .planning/PROJECT.md
 | 1 | Foundation & Authentication | Complete (2026-05-09) | 6/6 |
 | 2 | Invitation Creation & Management | Complete (2026-05-09) | 2/2 |
 | 3 | Recipient Experience | Complete (2026-07-30) | 2/2 |
-| 4 | Notifications & Invitation Lifecycle | Executing (2026-08-13) | 3/4 |
+| 4 | Notifications & Invitation Lifecycle | Complete (2026-08-13) | 4/4 |
 | 5 | Internationalization & Responsive Polish | Pending | 0/0 |
 
 ## Recent Decisions
@@ -67,7 +67,7 @@ See: .planning/PROJECT.md
 ## Human Actions Pending
 
 1. ✅ **DONE (2026-08-12):** throwaway `ohyes-pg` (postgres:16) is running on localhost:5432 and `backend/.env` exists (git-ignored, DATABASE_URL → local). `alembic upgrade head` succeeded — users/invitations/notifications tables created. If the container was stopped since (reboot), restart with `docker start ohyes-pg`. To reset: `docker rm -f ohyes-pg` then re-run the `docker run` from the create step. NEVER point DATABASE_URL at Railway prod.
-2. Confirm the 30-day notification retention window at the 04-04 Task 2 checkpoint (blocking `checkpoint:decision`). D-07 is one-way. First-run backup is NOT needed while prod holds only test data — becomes a launch-checklist item once real recipients exist.
+2. ✅ **DONE (2026-08-13):** Confirmed the notification retention window at the 04-04 Task 2 checkpoint (blocking `checkpoint:decision`, D-07 one-way): `retain-30` — 30 days, as originally locked. `NOTIFICATION_RETENTION_DAYS = 30` implemented in `backend/app/tasks/cleanup.py`. First-run backup is NOT needed while prod holds only test data — becomes a launch-checklist item once real recipients exist.
 3. Complete the 11 manual UAT items in 03-VERIFICATION.md (`/gsd-verify-work 3`) — non-blocking
 4. Re-test the recipient page on the deployed app; Phase 3 fixes (12024ae, 31fa71a, 4a3da61, 824fc9d) are unconfirmed live — non-blocking
 5. Ask the gateway owner which Claude model IDs are routable through orion-model.wneweb.com.tw (Opus 4.8 returned auth failure) — non-blocking
@@ -76,8 +76,8 @@ See: .planning/PROJECT.md
 
 **Resume file:** None
 
-Last session: 2026-08-13T00:47:48.395Z
-Stopped at: Completed 04-03-PLAN.md
+Last session: 2026-08-13T01:08:01.917Z
+Stopped at: Completed 04-04-PLAN.md
 Next action: `/gsd-execute-phase 4` (start throwaway docker PG + backend/.env first — see Human Actions #1)
 
 ---
@@ -88,6 +88,7 @@ Next action: `/gsd-execute-phase 4` (start throwaway docker PG + backend/.env fi
 - [Phase 4]: Phase 4 Plan 01 (Wave 0 harness): db_session rollback fixture confirmed to hold across two full-suite runs (assumption A4); AsyncIOScheduler bare-coroutine-job behavior confirmed by passing test (Open Question 1); apscheduler 3.11.3 approved and pinned
 - [Phase 4]: Phase 4 Plan 02 (tracer): GET /api/notifications owner-scoped no-pagination endpoint, NotificationResponse schema, and NotificationBell/Panel/Row components landed; full browser/OAuth visual confirmation deferred to human verifier (A-02-1); title/name cap amendment (A-02-2) still not landed
 - [Phase 4]: Phase 4 Plan 03 (read/poll loop): bulk owner-scoped POST /api/notifications/read, 30s dashboard poll with 401-redirect + silent retry, NotificationBell snapshot-before-mark/showDot/bounce, NotificationPanel highlight+focus+responsive-origin wiring landed. NotificationRow highlight + i18n keys confirmed already correct from 04-02, no changes needed.
+- [Phase 4]: Phase 4 Plan 04 (cleanup sweep): Task 2 checkpoint (D-07, one-way) confirmed retain-30 (30 days); hourly APScheduler sweep in the FastAPI lifespan, guarded by pg_try_advisory_xact_lock, bulk-deletes expired invitations (row+photo) and prunes notifications past retention in one transaction; NOTF-V2-02 reclassified v2 to v1. Full backend suite green: 28 passed, 0 xfailed.
 
 ## Performance Metrics
 
@@ -96,3 +97,4 @@ Next action: `/gsd-execute-phase 4` (start throwaway docker PG + backend/.env fi
 | Phase 04 P01 | 20min | 5 tasks | 7 files |
 | Phase 04 P02 | 45min | 3 tasks | 10 files |
 | Phase 4 P03 | 25min | 3 tasks | 5 files |
+| Phase 04 P04 | 20min | 5 tasks | 5 files |

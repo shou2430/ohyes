@@ -21,7 +21,7 @@ Requirements for initial release. Each maps to roadmap phases.
 - [ ] **INV-04**: Each invitation generates a unique shareable URL
 - [ ] **INV-05**: User can have max 2 active invitations at a time
 - [ ] **INV-06**: User can delete their own invitations
-- [ ] **INV-07**: Invitations auto-expire and are fully deleted (data + photo) after 7 days
+- [x] **INV-07**: Invitations auto-expire and are fully deleted (data + photo) after 7 days
 
 ### Recipient Experience
 
@@ -104,7 +104,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | INV-04 | Phase 2 | Pending |
 | INV-05 | Phase 2 | Pending |
 | INV-06 | Phase 2 | Pending |
-| INV-07 | Phase 4 | Pending |
+| INV-07 | Phase 4 | Complete |
 | RCPT-01 | Phase 3 | Pending |
 | RCPT-02 | Phase 3 | Pending |
 | RCPT-03 | Phase 3 | Pending |
