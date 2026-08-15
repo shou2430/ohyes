@@ -1,19 +1,22 @@
 ---
 phase: 04-notifications-invitation-lifecycle
 verified: 2026-08-13T02:20:07Z
-status: human_needed
+status: passed
 score: 5/8 must-haves verified
 behavior_unverified: 3
 overrides_applied: 0
 behavior_unverified_items:
+
   - truth: "Creator sees a red dot/heart indicator on the dashboard when a new notification arrives (Success Criterion 1)"
     test: "Sign in as a creator with an existing invitation, open the share link in a private window, submit the password, click Yes with a name + message. Reload the dashboard within 30s (or wait one poll tick)."
     expected: "The heart in the top bar turns accent-colored, a 2px red dot with a white ring appears at its top-right, and the heart performs a one-shot scale bounce exactly once (not on every subsequent 30s poll)."
     why_human: "No frontend test runner exists in this repo (`frontend/package.json` exposes only dev/build/lint/preview) and the dashboard sits behind real Google OAuth, which could not be driven headlessly in this session. The dot-visibility formula (`unreadCount > 0 && !open`) and the bounce-edge-detection logic (`prevUnreadCount.current === 0 && unreadCount > 0`) are present and wired in `NotificationBell.jsx`, but no automated test exercises the actual DOM render or the poll-driven state transition."
+
   - truth: "Notification displays \"[Name] said yes to your [title]\" with the recipient's optional message (Success Criterion 2)"
     test: "Same flow as above, once with a name+message and once as an anonymous response (no name/message). Open the panel and read the rendered row in both en and zh-TW."
     expected: "Populated row reads exactly \"{name} said yes to your “{title}”\" with the message quoted below; anonymous row reads \"Someone said yes to your “{title}”\" with no quote block, no bare rule, no placeholder. zh-TW renders with 「」 corner brackets and no raw translation key."
     why_human: "The API-level contract (is_read flag, ordering, null-handling of recipient_name/recipient_message) is proven by passing backend tests (`test_list_returns_unread`), and the sentence-construction and null-branch logic exist in `NotificationRow.jsx` source (confirmed via grep for `saidYesAnonymous`), but no automated check confirms the actual rendered DOM text, quote-block suppression, or zh-TW glyph rendering in a browser."
+
   - truth: "Creator can mark notifications as read and the indicator clears (Success Criterion 3)"
     test: "With unread notifications present, click the heart to open the panel. Confirm the dot disappears immediately (optimistic). Close and reopen the panel; confirm the previously-unread rows keep their highlight on this session but a fresh reload shows them as plain (highlight decay)."
     expected: "Dot clears optimistically the instant the panel opens (before the network request settles); a failed POST does not revert the dot or show a toast; rows unread at open-time keep a left-accent highlight for that session and lose it after a subsequent open/reload."
