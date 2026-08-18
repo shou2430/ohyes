@@ -1,0 +1,1 @@
+No external API integration: Frontend-only i18n + responsive + load-perf polish; consumes the project's own internal FastAPI REST (recipient invitation/photo fetch), not any third-party API/SDK/service.
