@@ -7,6 +7,7 @@ import InvitationCard from "../components/InvitationCard";
 import LoadingSpinner from "../components/LoadingSpinner";
 import NotificationBell from "../components/NotificationBell";
 import Toast from "../components/Toast";
+import LanguageToggle from "../components/LanguageToggle";
 
 const API_URL = import.meta.env.VITE_API_URL || "";
 
@@ -138,6 +139,7 @@ export default function DashboardPage() {
           {t("app.name")}
         </span>
         <div className="flex items-center gap-2">
+          <LanguageToggle />
           <NotificationBell
             notifications={notifications}
             onMarkRead={handleMarkNotificationsRead}

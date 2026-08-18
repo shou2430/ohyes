@@ -4,6 +4,7 @@ import { Link } from "react-router";
 import { ArrowLeft, ImagePlus, Image, Eye, EyeOff, RefreshCw } from "lucide-react";
 import SuccessModal from "../components/SuccessModal";
 import Toast from "../components/Toast";
+import LanguageToggle from "../components/LanguageToggle";
 
 const API_URL = import.meta.env.VITE_API_URL || "";
 
@@ -141,7 +142,7 @@ export default function CreateInvitationPage() {
   return (
     <div className="min-h-screen bg-cream">
       {/* Back navigation */}
-      <div className="px-4 pt-4 sm:px-8">
+      <div className="flex items-center justify-between px-4 pt-4 sm:px-8">
         <Link
           to="/dashboard"
           className="inline-flex items-center gap-1 text-sm text-text-secondary hover:text-text-primary"
@@ -149,6 +150,7 @@ export default function CreateInvitationPage() {
           <ArrowLeft size={20} />
           {t("create.back")}
         </Link>
+        <LanguageToggle />
       </div>
 
       {/* Content: two columns on lg, single on mobile */}
