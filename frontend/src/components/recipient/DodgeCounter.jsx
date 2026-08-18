@@ -17,7 +17,7 @@ export default function DodgeCounter({ count }) {
 
   return (
     <div
-      className="mt-6 flex items-center justify-center gap-2"
+      className="mt-6 flex flex-wrap items-center justify-center gap-2"
       aria-live="polite"
     >
       <AnimatePresence>
@@ -35,7 +35,7 @@ export default function DodgeCounter({ count }) {
           {count}
         </motion.span>
       </AnimatePresence>
-      <span className="text-sm text-text-secondary">{getLabel(count, t)}</span>
+      <span className="text-sm text-text-secondary text-center">{getLabel(count, t)}</span>
     </div>
   );
 }
