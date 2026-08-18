@@ -3,6 +3,7 @@ import { LogIn } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 import { Navigate } from "react-router";
 import LoadingSpinner from "../components/LoadingSpinner";
+import LanguageToggle from "../components/LanguageToggle";
 
 export default function LandingPage() {
   const { t } = useTranslation();
@@ -21,7 +22,10 @@ export default function LandingPage() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-cream px-8">
+    <div className="relative flex min-h-screen items-center justify-center bg-cream px-8">
+      <div className="absolute right-4 top-4">
+        <LanguageToggle />
+      </div>
       <div className="flex max-w-[400px] flex-col items-center gap-6">
         <div className="text-center">
           <h1 className="text-4xl font-semibold text-text-primary">
