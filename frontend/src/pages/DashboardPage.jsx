@@ -158,12 +158,12 @@ export default function DashboardPage() {
               {initials}
             </div>
           )}
-          <span className="text-sm text-text-primary">
+          <span className="hidden sm:inline text-sm text-text-primary">
             {user?.display_name}
           </span>
           <button
             onClick={handleLogout}
-            className="flex items-center gap-1 text-sm text-text-secondary transition-colors hover:text-destructive"
+            className="flex min-h-[44px] items-center gap-1 px-2 text-sm text-text-secondary transition-colors hover:text-destructive"
           >
             <LogOut size={16} />
             {t("dashboard.logOut")}

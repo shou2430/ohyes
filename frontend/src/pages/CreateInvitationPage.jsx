@@ -145,7 +145,7 @@ export default function CreateInvitationPage() {
       <div className="flex items-center justify-between px-4 pt-4 sm:px-8">
         <Link
           to="/dashboard"
-          className="inline-flex items-center gap-1 text-sm text-text-secondary hover:text-text-primary"
+          className="inline-flex min-h-[44px] items-center gap-1 text-sm text-text-secondary hover:text-text-primary"
         >
           <ArrowLeft size={20} />
           {t("create.back")}
@@ -282,7 +282,7 @@ export default function CreateInvitationPage() {
                     setTouched((prev) => ({ ...prev, password: true }))
                   }
                   placeholder={t("create.passwordPlaceholder")}
-                  className={`h-11 w-full rounded-lg border px-3 pr-10 text-base text-text-primary outline-none transition-colors placeholder:text-text-secondary ${
+                  className={`h-11 w-full rounded-lg border px-3 pr-12 text-base text-text-primary outline-none transition-colors placeholder:text-text-secondary ${
                     errors.password && touched.password
                       ? "border-destructive focus:border-destructive focus:ring-1 focus:ring-destructive"
                       : "border-border focus:border-accent focus:ring-1 focus:ring-accent"
@@ -292,7 +292,7 @@ export default function CreateInvitationPage() {
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
                   aria-label={showPassword ? "Hide password" : "Show password"}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-text-secondary hover:text-text-primary"
+                  className="absolute right-0 top-1/2 flex min-h-[44px] min-w-[44px] -translate-y-1/2 items-center justify-center text-text-secondary hover:text-text-primary"
                 >
                   {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                 </button>

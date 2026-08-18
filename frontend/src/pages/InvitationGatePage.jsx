@@ -113,7 +113,7 @@ export default function InvitationGatePage() {
           </p>
           <Link
             to="/"
-            className="mt-4 inline-block text-sm text-accent hover:underline"
+            className="mt-4 inline-flex min-h-[44px] items-center text-sm text-accent hover:underline"
           >
             {t("invitation.goHome")}
           </Link>
