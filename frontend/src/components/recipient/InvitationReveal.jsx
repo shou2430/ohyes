@@ -33,7 +33,7 @@ export default function InvitationReveal({ invitation, onYesClick }) {
           {/* Photo */}
           <div className="mt-6 w-full rounded-xl overflow-hidden shadow-md aspect-[4/3] bg-cream relative">
             {!photoLoaded && !photoError && (
-              <div className="absolute inset-0 flex items-center justify-center">
+              <div className="absolute inset-0 flex items-center justify-center bg-stone-100 animate-pulse">
                 <LoadingSpinner />
               </div>
             )}
@@ -45,6 +45,8 @@ export default function InvitationReveal({ invitation, onYesClick }) {
             <img
               src={`${API_URL}${invitation.photo_url}`}
               alt={invitation.title}
+              fetchPriority="high"
+              decoding="async"
               className={`w-full object-cover aspect-[4/3] ${
                 photoLoaded ? "opacity-100" : "opacity-0"
               } transition-opacity`}

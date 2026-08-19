@@ -26,6 +26,8 @@ export default function InvitationGatePage() {
     if (!invitation?.photo_url) return;
     const img = new Image();
     img.crossOrigin = "anonymous";
+    img.fetchPriority = "high";
+    img.decoding = "async";
     img.onload = () => {
       try {
         const canvas = document.createElement("canvas");
