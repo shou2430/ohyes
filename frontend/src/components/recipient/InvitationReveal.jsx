@@ -45,6 +45,7 @@ export default function InvitationReveal({ invitation, onYesClick }) {
             <img
               src={`${API_URL}${invitation.photo_url}`}
               alt={invitation.title}
+              crossOrigin="anonymous"
               fetchPriority="high"
               decoding="async"
               className={`w-full object-cover aspect-[4/3] ${
