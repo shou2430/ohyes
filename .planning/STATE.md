@@ -64,6 +64,12 @@ See: .planning/PROJECT.md
 - Railway volume constraint could not be verified live (no network egress in the prior session). Quoted from CLAUDE.md. Verify when planning INFR-V2-01.
 - **Do not plan for more than one backend replica this milestone** — the photo volume pins the backend to a single container until INFR-V2-01 lands.
 
+### Quick Tasks Completed
+
+| # | Description | Date | Commit | Directory |
+|---|-------------|------|--------|-----------|
+| 260901-ndt | fix recipient photo double-fetch (crossOrigin mismatch) — UI-03 perf | 2026-09-01 | 009b500 | [260901-ndt-fix-recipient-photo-double-fetch-crossor](./quick/260901-ndt-fix-recipient-photo-double-fetch-crossor/) |
+
 ## Human Actions Pending
 
 1. ✅ **DONE (2026-08-12):** throwaway `ohyes-pg` (postgres:16) is running on localhost:5432 and `backend/.env` exists (git-ignored, DATABASE_URL → local). `alembic upgrade head` succeeded — users/invitations/notifications tables created. If the container was stopped since (reboot), restart with `docker start ohyes-pg`. To reset: `docker rm -f ohyes-pg` then re-run the `docker run` from the create step. NEVER point DATABASE_URL at Railway prod.
