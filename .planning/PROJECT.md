@@ -18,15 +18,22 @@ The moment of delight when someone sees a personalized page made just for them a
 - [x] Each invitation generates a unique shareable URL (with unique ID) — Validated in Phase 02: Invitation Creation & Management
 
 ### Active
-- [ ] Creator notification box with red dot/heart indicator showing "[Recipient] said yes to your [title]" + optional message
-- [ ] Invitations auto-expire and are deleted after 1 week
-- [ ] Bilingual UI (Traditional Chinese default with English toggle)
+- None — all v1 requirements shipped across Phases 01–05 (milestone v1.0 complete)
 
 ### Validated in Phase 03: Recipient Experience
 - [x] Recipient enters password to unlock the personalized page
 - [x] Personalized page displays: title, photo, Yes button, and a "No" button that increasingly frantically dodges the cursor
 - [x] Clicking "Yes" triggers a 30-character message dialog for the recipient
 - [x] Clicking "Yes" deletes the invitation data and notifies the creator
+
+### Validated in Phase 04: Notifications & Invitation Lifecycle
+- [x] Creator notification box with red dot/heart indicator showing "[Recipient] said yes to your [title]" + optional message
+- [x] Invitations auto-expire and are deleted after 1 week (hourly APScheduler sweep, advisory-lock guarded)
+
+### Validated in Phase 05: Internationalization & Responsive Polish
+- [x] Bilingual UI (Traditional Chinese default with English toggle, no page reload) — UI-02
+- [x] Mobile-first responsive design usable at 375px with ≥44px tap targets — UI-01
+- [x] Invitation page loads in under 3 seconds on a throttled mobile connection — UI-03
 
 ### Out of Scope
 
@@ -83,4 +90,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-05-10 after Phase 03 completion*
+*Last updated: 2026-09-01 after Phase 05 (milestone v1.0 complete — all 5 phases shipped)*

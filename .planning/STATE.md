@@ -2,16 +2,16 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: v1 Launch
-current_phase: 5
-current_phase_name: Internationalization & Responsive Polish
-status: executing
-stopped_at: Completed 04-04-PLAN.md
-last_updated: "2026-08-18T06:00:56.729Z"
+current_phase: 05
+status: completed
+stopped_at: Phase 5 complete — milestone v1.0 at 100% (all 5 phases done)
+last_updated: "2026-09-01T11:09:02.331Z"
 progress:
   total_phases: 5
-  completed_phases: 3
-  total_plans: 20
-  completed_plans: 14
+  completed_phases: 5
+  total_plans: 17
+  completed_plans: 17
+current_phase_name: Internationalization & Responsive Polish
 ---
 
 # Project State: OhYes
@@ -19,16 +19,16 @@ progress:
 ## Current Status
 
 **Milestone:** 1 (v1 Launch)
-**Phase:** 5 — Internationalization & Responsive Polish
-**Status:** Executing Phase 05
-**Overall:** 4/5 phases complete
+**Phase:** 05
+**Status:** All phases complete — milestone v1.0 ready to close
+**Overall:** 5/5 phases complete (17/17 plans)
 
 ## Project Reference
 
-See: .planning/PROJECT.md
+See: .planning/PROJECT.md (updated 2026-09-01)
 
 **Core value:** The moment of delight when someone sees a personalized page made just for them and realizes they can't say no — literally.
-**Current focus:** Phase 05 — internationalization-responsive-polish
+**Current focus:** Milestone v1.0 complete — next: `/gsd-complete-milestone v1.0`
 
 ## Phase Status
 
@@ -38,7 +38,7 @@ See: .planning/PROJECT.md
 | 2 | Invitation Creation & Management | Complete (2026-05-09) | 2/2 |
 | 3 | Recipient Experience | Complete (2026-07-30) | 2/2 |
 | 4 | Notifications & Invitation Lifecycle | Complete (2026-08-13) | 4/4 |
-| 5 | Internationalization & Responsive Polish | Pending | 0/0 |
+| 5 | Internationalization & Responsive Polish | Complete (2026-09-01) | 3/3 |
 
 ## Recent Decisions
 
@@ -57,6 +57,10 @@ See: .planning/PROJECT.md
 - Phase 4 planned: 4 plans, Wave 0 (04-01 test harness) → Wave 1 (04-02 tracer, 04-03 read/poll) → Wave 2 (04-04 cleanup sweep). Plan-checker passed with 0 blockers, 5 warnings (W1-W3 no-fix; W4/W5 optional nits unfixed)
 - Backend package index pinned to pypi.org via new `backend/uv.toml` (commit 83ae49f), overriding the global corporate Nexus default — a Nexus-pinned uv.lock would break Railway's `uv sync --frozen` build. uv.lock restored to pypi.org
 - Backend tests run against a throwaway docker PostgreSQL 16 at execution time (no CI exists; Railway build does not run tests). Never point DATABASE_URL at prod
+- Phase 5 complete: i18n bilingual toggle (allow-list default zh-TW), 375px responsive, load-perf code-split (148.71→93.15 kB gzip main). All 3 plans + code review (0 crit) + verify + 6/6 UAT pass
+- Fixed recipient photo double-fetch (quick 260901-ndt): `<img crossOrigin="anonymous">` now shares cache with the keepsake canvas preload → single 143KB fetch (was 2). Confirmed via backend log (photo-GET == verify count) and Slow-4G Network panel
+- First frontend test harness stood up in Phase 5 validation: vitest 4.x, 9 i18n tests green (allow-list + en/zh-TW key parity). esbuild build approved via `frontend/pnpm-workspace.yaml`. Frontend uses pnpm, NOT npm (npm corrupts the pnpm node_modules layout)
+- Local UAT env this session: podman (not docker — Docker Hub blocked by corp network) postgres:16 as `ohyes-pg`, pulled via `source ~/personal_proxy.sh` (daemon ignores shell proxy; podman honors it)
 
 ## Blockers / Concerns
 
@@ -82,12 +86,12 @@ See: .planning/PROJECT.md
 
 **Resume file:** None
 
-Last session: 2026-08-13T01:08:01.917Z
-Stopped at: Completed 04-04-PLAN.md
-Next action: `/gsd-execute-phase 4` (start throwaway docker PG + backend/.env first — see Human Actions #1)
+Last session: 2026-09-01T11:10:00Z
+Stopped at: Phase 5 complete (UAT 6/6, SECURITY.md threats_open:0, VALIDATION.md validated). Milestone v1.0 at 100% (5/5 phases). Local UAT stack (podman ohyes-pg + backend :8000 + preview :4173 + dev :5173) still running.
+Next action: `/gsd-complete-milestone v1.0` — archive milestone and prepare next
 
 ---
-*Last updated: 2026-08-12 on session resume*
+*Last updated: 2026-09-01 after Phase 5 (milestone v1.0 complete)*
 
 ## Decisions
 

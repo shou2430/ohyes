@@ -1,27 +1,33 @@
 ---
 phase: 05-internationalization-responsive-polish
 verified: 2026-08-19T00:00:00Z
-status: human_needed
+status: passed
 score: 11/20 truths verified (9 require human/browser confirmation with the backend running — deferred to phase UAT, not failed)
 behavior_unverified: 0
 overrides_applied: 0
 re_verification: null
 human_verification:
+
   - test: "Sign in and confirm LanguageToggle switches ALL text on Dashboard and Create with no reload; toggle visible top-right on both; document.documentElement.lang syncs."
     expected: "All t()-driven text on Dashboard/Create flips zh-TW<->en instantly, no navigation/reload."
     why_human: "Requires a signed-in session (Google OAuth) + running backend to reach Dashboard/Create; not reachable this session (backend not running)."
+
   - test: "At 375px (DevTools device toolbar), inspect the Dashboard header (empty + populated invitation states), Create form, InvitationGatePage loading/expired states, and confirm no horizontal scrollbar; inspect computed box height/width of logout, Back link, show/hide-password eye icon, and goHome link (expect >=44x44px)."
     expected: "No horizontal overflow on any state; all listed controls report a computed box >=44x44px."
     why_human: "Computed box sizes and live overflow at 375px cannot be proven by static grep; signed-in pages and cannot be reached without the backend running this session."
+
   - test: "At 375px, open a live recipient link /i/:code, walk PasswordGate -> InvitationReveal -> DodgeCounter -> MessageCard -> PostcardKeepsake -> InvitationGatePage expired state; confirm no overflow anywhere, tap targets >=44px, and that the No button still dodges the cursor/finger with unchanged escalating behavior (STAGES 1-5)."
     expected: "No horizontal overflow at any recipient screen; Unlock/Download/Yes buttons >=44px; No button dodge feel unchanged from pre-phase-5 behavior."
     why_human: "Requires a live invitation (password-gated, real photo) served by a running backend; the dodge 'feel' is a runtime/tactile judgment, not a static property."
+
   - test: "Under DevTools Fast 3G throttling, hard-reload a live /i/:code, enter the password, and time how long until the personalized page (title + photo) is VISIBLE and Yes/No are CLICKABLE."
     expected: "Under 3 seconds (D-10 acceptance target)."
     why_human: "Flagged, human-timed measurement (D-10) — requires a live backend + real invitation + real photo; no automated load-test harness exists in this repo."
+
   - test: "In DevTools Network, inspect the recipient photo request's Content-Type and transferred size."
     expected: "Content-Type: image/webp, size roughly 100-200 KB (D-09 acceptance-check; backend pipeline output, no code added this phase)."
     why_human: "Requires the backend to actually serve a real uploaded photo; cannot be produced by static analysis."
+
   - test: "Watch the InvitationReveal photo load in (skeleton -> fade) with a real photo and confirm the Yes/No row below the photo does not visually jump (CLS ~ 0)."
     expected: "The aspect-[4/3] box holds its footprint throughout; no vertical layout shift as the photo fades in."
     why_human: "Requires a live photo to observe the actual load transition; class/attribute presence (aspect-[4/3], animate-pulse, fetchPriority, transition-opacity) is code-confirmed but the visual no-jump outcome is not."

@@ -43,9 +43,9 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### UI/UX
 
-- [ ] **UI-01**: Mobile-first responsive design
-- [ ] **UI-02**: Bilingual UI — Traditional Chinese (default) with English toggle
-- [ ] **UI-03**: Page loads in under 3 seconds on mobile
+- [x] **UI-01**: Mobile-first responsive design
+- [x] **UI-02**: Bilingual UI — Traditional Chinese (default) with English toggle
+- [x] **UI-03**: Page loads in under 3 seconds on mobile
 
 ### Infrastructure
 
@@ -117,9 +117,9 @@ Which phases cover which requirements. Updated during roadmap creation.
 | NOTF-02 | Phase 4 | Complete |
 | NOTF-03 | Phase 4 | Complete |
 | NOTF-V2-02 | Phase 4 | Complete |
-| UI-01 | Phase 5 | Pending |
-| UI-02 | Phase 5 | Pending |
-| UI-03 | Phase 5 | Pending |
+| UI-01 | Phase 5 | Complete |
+| UI-02 | Phase 5 | Complete |
+| UI-03 | Phase 5 | Complete |
 | INFR-01 | Phase 1 | Complete |
 | INFR-02 | Phase 1 | Complete |
 
