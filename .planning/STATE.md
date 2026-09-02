@@ -4,8 +4,10 @@ milestone: v1.0
 milestone_name: v1 Launch
 current_phase: 05
 status: completed
-stopped_at: Phase 5 complete — milestone v1.0 at 100% (all 5 phases done)
-last_updated: "2026-09-01T11:09:02.331Z"
+stopped_at: "Phase 5 complete (UAT 6/6, SECURITY.md threats_open:0, VALIDATION.md validated). Milestone v1.0 at 100% (5/5 phases). Local UAT stack (podman ohyes-pg + backend :8000 + preview :4173 + dev :5173) still running."
+last_updated: "2026-09-01T12:03:17.204Z"
+last_activity: 2026-09-01
+last_activity_desc: Milestone v1.0 completed and archived
 progress:
   total_phases: 5
   completed_phases: 5
@@ -20,7 +22,7 @@ current_phase_name: Internationalization & Responsive Polish
 
 **Milestone:** 1 (v1 Launch)
 **Phase:** 05
-**Status:** All phases complete — milestone v1.0 ready to close
+**Status:** v1.0 milestone complete
 **Overall:** 5/5 phases complete (17/17 plans)
 
 ## Project Reference
@@ -108,3 +110,14 @@ Next action: `/gsd-complete-milestone v1.0` — archive milestone and prepare ne
 | Phase 04 P02 | 45min | 3 tasks | 10 files |
 | Phase 4 P03 | 25min | 3 tasks | 5 files |
 | Phase 04 P04 | 20min | 5 tasks | 5 files |
+
+## Current Position
+
+Phase: Milestone v1.0 complete
+Plan: —
+Status: Awaiting next milestone
+Last activity: 2026-09-01 — Milestone v1.0 completed and archived
+
+## Operator Next Steps
+
+- Start the next milestone with /gsd-new-milestone

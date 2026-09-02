@@ -50,6 +50,11 @@ The moment of delight when someone sees a personalized page made just for them a
 - Deploy on Railway (frontend + backend + PostgreSQL + persistent volume for photos)
 - The "No" button behavior is the signature feature — it should feel fun, not frustrating. Starts with gentle dodges, escalates to frantic escapes
 
+**Current state (after v1.0, 2026-09-01):**
+- Shipped all 27 v1 requirements across 5 phases (216 commits, ~120 days). Stack: React 19 + Vite + Tailwind v4 + Motion frontend; FastAPI + SQLAlchemy async + asyncpg + PostgreSQL 16 backend; Authlib Google OAuth; Pillow photo pipeline; APScheduler cleanup — all on Railway.
+- Backend has a real test suite (throwaway docker/podman postgres:16, ~28 tests green); frontend has a first vitest harness (9 i18n tests). No CI yet — tests run locally, Railway build does not run them.
+- **Known tech debt / next-milestone lead:** photo storage on the single-mount Railway volume pins the backend to one container (INFR-V2-01 — migrate to Storage Buckets to unblock horizontal scale). Several Phase 3/5 UAT items remain human-verify-only (no headless OAuth/browser harness). Gateway model-routing for Opus 4.8 unresolved.
+
 ## Constraints
 
 - **Tech stack**: React (frontend) + FastAPI (backend) + PostgreSQL (database)
@@ -65,12 +70,14 @@ The moment of delight when someone sees a personalized page made just for them a
 | Decision | Rationale | Outcome |
 |----------|-----------|---------|
 | Google OAuth for auth | Low friction, no password management needed for a casual app | ✓ Validated (Phase 01) |
-| PostgreSQL over MongoDB | Structured data, clear relations, better for expiry queries and Railway support | — Pending |
-| Railway volume for photos | Simplest option, avoids external service dependency for v1 | — Pending |
-| Bilingual (zh-TW + en) | Broaden audience, default Traditional Chinese with toggle | — Pending |
+| PostgreSQL over MongoDB | Structured data, clear relations, better for expiry queries and Railway support | ✓ Validated (v1.0 — powers users/invitations/notifications + expiry sweep) |
+| Railway volume for photos | Simplest option, avoids external service dependency for v1 | ⚠️ Revisit (works, but single-mount pins backend to 1 container — INFR-V2-01 migrates to Storage Buckets next milestone) |
+| Bilingual (zh-TW + en) | Broaden audience, default Traditional Chinese with toggle | ✓ Validated (Phase 05 — no-reload toggle, 79/79 key parity) |
 | Increasingly frantic No button | Starts gentle, escalates — fun without being frustrating | ✓ Validated (Phase 03) |
-| 2 invitation limit per user | Prevent abuse, keep it meaningful | — Pending |
-| 7-day expiry | Keep data fresh, auto-cleanup, prevent stale invitations | — Pending |
+| 2 invitation limit per user | Prevent abuse, keep it meaningful | ✓ Validated (Phase 02) |
+| 7-day expiry | Keep data fresh, auto-cleanup, prevent stale invitations | ✓ Validated (Phase 04 — hourly advisory-lock APScheduler sweep, row + photo) |
+| APScheduler in-process over Celery/Redis | A separate worker can't mount the single Railway volume; one hourly job doesn't justify a broker | ✓ Validated (Phase 04) |
+| NOTF-V2-02 pulled forward to v1 | 30-day notification retention was cheap to add alongside the expiry sweep | ✓ Validated (Phase 04, D-07) |
 
 ## Evolution
 
