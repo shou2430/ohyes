@@ -75,6 +75,7 @@ See: .planning/PROJECT.md (updated 2026-09-01)
 | # | Description | Date | Commit | Directory |
 |---|-------------|------|--------|-----------|
 | 260901-ndt | fix recipient photo double-fetch (crossOrigin mismatch) — UI-03 perf | 2026-09-01 | 009b500 | [260901-ndt-fix-recipient-photo-double-fetch-crossor](./quick/260901-ndt-fix-recipient-photo-double-fetch-crossor/) |
+| 260902-cng | fix Railway pnpm build "packages field missing or empty" (pnpm-workspace.yaml + version pin) | 2026-09-02 | 87d8e2a | [260902-cng-fix-railway-pnpm-workspace-build](./quick/260902-cng-fix-railway-pnpm-workspace-build/) |
 
 ## Human Actions Pending
 
