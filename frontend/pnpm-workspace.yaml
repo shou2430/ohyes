@@ -1,2 +1,16 @@
+# Single-package project (not a monorepo). This file exists only to:
+#   1. carry a `packages:` field so the pnpm on the Railway builder does not fail
+#      with "packages field missing or empty", and
+#   2. approve esbuild's install/build script so `vite build` has its binary.
+#      Without approval, pnpm's secure-by-default install skips it
+#      (ERR_PNPM_IGNORED_BUILDS) and the build fails.
+packages:
+  - .
+
+# pnpm 11+ approval mechanism.
 allowBuilds:
   esbuild: true
+
+# pnpm 9/10 approval mechanism (kept for builder-version resilience).
+onlyBuiltDependencies:
+  - esbuild
