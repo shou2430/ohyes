@@ -1,6 +1,6 @@
 import { useTranslation } from "react-i18next";
 import { LogIn } from "lucide-react";
-import { useAuth } from "../context/AuthContext";
+import { useAuth } from "../context/auth-context";
 import { Navigate } from "react-router";
 import LoadingSpinner from "../components/LoadingSpinner";
 import LanguageToggle from "../components/LanguageToggle";

@@ -7,7 +7,6 @@ export default function AuthCallbackPage() {
 
   useEffect(() => {
     const token = searchParams.get("token");
-    const error = searchParams.get("error");
 
     if (token) {
       localStorage.setItem("ohyes_token", token);

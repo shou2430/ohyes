@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { LogOut } from "lucide-react";
 import { Link, useNavigate } from "react-router";
-import { useAuth } from "../context/AuthContext";
+import { useAuth } from "../context/auth-context";
 import InvitationCard from "../components/InvitationCard";
 import LoadingSpinner from "../components/LoadingSpinner";
 import NotificationBell from "../components/NotificationBell";
