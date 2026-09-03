@@ -1,0 +1,110 @@
+# Tech Debt & Known Issues — OhYes
+
+Living record of debt, gaps, and risks carried out of v1.0. Pull relevant items
+into a future milestone's requirements via `/gsd-new-milestone`, or knock them
+out standalone via `/gsd-quick`.
+
+**Created:** 2026-09-02 (after v1.0 close)
+
+---
+
+## 1. Automation / CI (highest leverage)
+
+- **No CI.** Tests run only locally; the Railway build does not run them, so
+  regressions rely on developer diligence.
+  - Scope: GitHub Actions running backend `pytest` (with a `postgres:16` service
+    container), frontend `pnpm test` (vitest), and lint (ruff + eslint).
+  - **Does NOT need a milestone** — good as a standalone `/gsd-quick`, or as the
+    first phase of v1.1. Recommended to land *before* INFR-V2-01 (photo-path
+    rework) as a safety net.
+  - Note: backend tests expect a throwaway Postgres (never point `DATABASE_URL`
+    at Railway prod). Frontend is pnpm — CI must use pnpm, and approve the
+    esbuild build (see the pnpm-workspace.yaml `allowBuilds`/`packages` setup
+    fixed in quick 260902-cng).
+
+## 2. Test / QA harness gaps
+
+- **No headless OAuth / browser test harness.** A large share of UAT is
+  manual-only because the dashboard sits behind real Google OAuth that can't be
+  driven headlessly. This is why Phases 3–5 have many `human_needed` verification
+  items.
+- **Backend suite is solid** (throwaway docker/podman postgres:16, ~28 tests
+  green) — the gap is frontend/E2E, not backend units.
+
+## 3. Lint debt (repo is not green)
+
+Pre-existing, never fixed (documented in Phase 4 & 5 `deferred-items.md`):
+
+- **Frontend ESLint (3):**
+  - `frontend/src/components/recipient/SparkleTrail.jsx:15` —
+    `react-refresh/only-export-components` (module exports `spawnSparkles`
+    alongside a component). Introduced commit 2879d12 (Phase 3).
+  - `frontend/src/context/AuthContext.jsx:65` —
+    `react-refresh/only-export-components` (exports `useAuth`).
+  - `frontend/src/pages/AuthCallbackPage.jsx:10` — `no-unused-vars`
+    (`error` assigned but never used).
+- **Backend ruff:** `backend/app/routers/invitations.py` — 1 unused
+  `sqlalchemy.func` import + 2 `E501` line-too-long.
+
+Small, cheap to clear; doing it is a prerequisite for a meaningful CI lint gate.
+
+## 4. Pending manual UAT / unverified-live
+
+- Phase 3: 11 manual recipient-experience UAT items in `03-VERIFICATION.md`
+  (`/gsd-verify-work 3`).
+- Phase 3 fixes (`12024ae`, `31fa71a`, `4a3da61`, `824fc9d`) were unconfirmed on
+  the deployed app at close. **The v1.0 deploy now succeeds (2026-09-03) — these
+  are re-verifiable and worth clearing.**
+- Phase 5: 9 browser/backend items — dashboard language toggle, 375px tap
+  targets, Fast-3G < 3s load, recipient photo Content-Type/size.
+
+## 5. Operational / launch checklist
+
+- **Cleanup-sweep first-run backup.** Not needed while prod holds only test data;
+  becomes a launch-checklist item once real recipients exist (guard against a bad
+  sweep deleting real invitations/photos).
+- **Railway volume single-mount constraint never verified live** — confirm when
+  planning INFR-V2-01.
+
+## 6. Infra change in flight — readonly uploads PVC ⚠️ (BLOCKING for the photo pipeline)
+
+Reported 2026-09-03: the persistent-volume responsibility is being **split into
+two parts**, and the uploads claim (`infra-nfs-uploads-pvc`) will be mounted
+**read-only**. This suggests the real deployment target is **Kubernetes + NFS
+PVCs**, not the Railway volume described in CLAUDE.md.
+
+**Risk: the current backend REQUIRES write access to `PHOTO_STORAGE_PATH`.**
+A read-only mount breaks every one of these:
+
+| Where | Operation | Breaks under RO mount |
+|-------|-----------|-----------------------|
+| `backend/app/main.py:25` | `Path(PHOTO_STORAGE_PATH).mkdir(...)` on startup | ✗ boot fails |
+| `backend/app/routers/invitations.py:130,139` | `mkdir` + `photo_path.write_bytes(...)` on create | ✗ upload → 503 |
+| `backend/app/routers/invitations.py:193` | `os.remove(photo_path)` on delete | ✗ |
+| `backend/app/routers/invitations.py:288` | `os.remove(photo_path)` on recipient "Yes" | ✗ |
+| `backend/app/tasks/cleanup.py:98` | photo delete in hourly sweep | ✗ |
+
+**Open questions (need answers before code changes):**
+1. What are the "two parts"? Which component/mount does the backend **write**
+   through, and which is the read-only serve path?
+2. Do the RW writer and the RO reader point at the **same** underlying NFS export
+   (so a file written via the RW path is visible via the RO path)?
+3. Is the intent that the FastAPI backend becomes **read-only for photos** (serves
+   only) while a separate uploader writes? If so, the create/delete/respond/cleanup
+   write paths must move out of the serving backend.
+
+This overlaps with **INFR-V2-01** (photo storage rework) and likely changes its
+shape — it may no longer be "migrate to Storage Buckets" but "split read/write
+mounts on NFS." Reconcile the two before scoping v1.1.
+
+---
+
+## Suggested sequencing
+
+1. **CI + clear lint/test to green** (`/gsd-quick` or v1.1 phase 1) — low cost,
+   high leverage; safety net for everything below.
+2. **Resolve the readonly-PVC / photo-storage architecture** (§6 + INFR-V2-01) —
+   this is now the real infra headliner and is *blocking* if the RO mount lands
+   before the code is adapted.
+3. **Signature-experience polish** (RCPT-V2-01 sound, RCPT-V2-02 escalating text).
+4. **Clear pending UAT** on the now-deployable app.
