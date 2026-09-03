@@ -7,7 +7,7 @@ from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile
-from sqlalchemy import func, select
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.config import settings
@@ -90,7 +90,10 @@ async def create_invitation(
     if active_count >= MAX_ACTIVE_INVITATIONS:
         raise HTTPException(
             status_code=409,
-            detail="Maximum of 2 active invitations reached. Delete one to create a new one.",
+            detail=(
+                "Maximum of 2 active invitations reached. "
+                "Delete one to create a new one."
+            ),
         )
 
     # Read and validate photo
@@ -253,7 +256,10 @@ async def respond_to_invitation(
     body: InvitationRespondRequest,
     db: AsyncSession = Depends(get_db),
 ):
-    """Public endpoint: recipient says Yes. Creates notification, deletes invitation and photo."""
+    """Public endpoint: recipient says Yes.
+
+    Creates notification, deletes invitation and photo.
+    """
     now = datetime.now(timezone.utc)
     result = await db.execute(
         select(Invitation).where(

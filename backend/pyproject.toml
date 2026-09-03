@@ -31,6 +31,10 @@ dev = [
 [tool.ruff]
 target-version = "py312"
 line-length = 88
+# Alembic autogenerates these; long server_default/column lines routinely trip
+# E501. Excluding keeps the CI lint gate green across future `alembic revision
+# --autogenerate` runs. Hand-written alembic files (env.py) stay linted.
+extend-exclude = ["alembic/versions"]
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "N", "W"]

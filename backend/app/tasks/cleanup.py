@@ -84,7 +84,9 @@ async def _delete_old_notifications(db) -> int:
     Plain DELETE, no RETURNING — notification retention has no filesystem
     side effect (D-07, D-21)."""
     cutoff = datetime.now(timezone.utc) - timedelta(days=NOTIFICATION_RETENTION_DAYS)
-    result = await db.execute(delete(Notification).where(Notification.created_at < cutoff))
+    result = await db.execute(
+        delete(Notification).where(Notification.created_at < cutoff)
+    )
     return result.rowcount
 
 
