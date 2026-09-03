@@ -76,6 +76,7 @@ See: .planning/PROJECT.md (updated 2026-09-01)
 |---|-------------|------|--------|-----------|
 | 260901-ndt | fix recipient photo double-fetch (crossOrigin mismatch) — UI-03 perf | 2026-09-01 | 009b500 | [260901-ndt-fix-recipient-photo-double-fetch-crossor](./quick/260901-ndt-fix-recipient-photo-double-fetch-crossor/) |
 | 260902-cng | fix Railway pnpm build "packages field missing or empty" (pnpm-workspace.yaml + version pin) | 2026-09-02 | 87d8e2a | [260902-cng-fix-railway-pnpm-workspace-build](./quick/260902-cng-fix-railway-pnpm-workspace-build/) |
+| 260903-fao | add GitHub Actions CI (backend pytest+ruff w/ postgres:16 service, frontend vitest+eslint) + clear all lint debt to green | 2026-09-03 | e14c8b7 | [260903-fao-ci-github-actions-backend-pytest-fronten](./quick/260903-fao-ci-github-actions-backend-pytest-fronten/) |
 
 ## Human Actions Pending
 
@@ -117,7 +118,7 @@ Next action: `/gsd-complete-milestone v1.0` — archive milestone and prepare ne
 Phase: Milestone v1.0 complete
 Plan: —
 Status: Awaiting next milestone
-Last activity: 2026-09-01 — Milestone v1.0 completed and archived
+Last activity: 2026-09-03 — Completed quick task 260903-fao: GitHub Actions CI + lint-to-green
 
 ## Operator Next Steps
 
