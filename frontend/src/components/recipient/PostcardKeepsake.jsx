@@ -1,12 +1,14 @@
 import { useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Download } from "lucide-react";
+import { coverCrop } from "./coverCrop";
 
 const API_URL = import.meta.env.VITE_API_URL || "";
 
 export default function PostcardKeepsake({ invitation, cachedPhotoUrl }) {
   const { t } = useTranslation();
   const postcardRef = useRef(null);
+  const photoRef = useRef(null);
   const [downloading, setDownloading] = useState(false);
 
   const handleDownload = async () => {
@@ -18,6 +20,30 @@ export default function PostcardKeepsake({ invitation, cachedPhotoUrl }) {
       const canvas = await html2canvas(postcardRef.current, {
         useCORS: true,
         scale: 2,
+        onclone: (doc) => {
+          // html2canvas ignores object-fit and stretches the whole photo into
+          // the <img> box, so hand it a copy pre-cropped to what cover shows.
+          const photo = photoRef.current;
+          const clone = doc.querySelector("[data-postcard-photo]");
+          if (!photo || !clone || !photo.naturalWidth) return;
+          const { sx, sy, sw, sh } = coverCrop(
+            photo.naturalWidth,
+            photo.naturalHeight,
+            photo.clientWidth,
+            photo.clientHeight
+          );
+          const crop = document.createElement("canvas");
+          crop.width = Math.round(sw);
+          crop.height = Math.round(sh);
+          crop.getContext("2d").drawImage(photo, sx, sy, sw, sh, 0, 0, crop.width, crop.height);
+          // html2canvas reads currentSrc, which only updates once the new
+          // src has loaded; it awaits onclone, so wait for that here.
+          return new Promise((resolve) => {
+            clone.onload = clone.onerror = resolve;
+            clone.removeAttribute("srcset");
+            clone.src = crop.toDataURL("image/png");
+          });
+        },
       });
       canvas.toBlob((blob) => {
         if (!blob) return;
@@ -45,6 +71,8 @@ export default function PostcardKeepsake({ invitation, cachedPhotoUrl }) {
         className="bg-white rounded-2xl shadow-xl overflow-hidden"
       >
         <img
+          ref={photoRef}
+          data-postcard-photo
           src={cachedPhotoUrl || `${API_URL}${invitation.photo_url}`}
           alt={invitation.title}
           className="w-full max-h-[420px] object-cover"
