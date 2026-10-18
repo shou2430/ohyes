@@ -78,6 +78,7 @@ See: .planning/PROJECT.md (updated 2026-09-01)
 | 260902-cng | fix Railway pnpm build "packages field missing or empty" (pnpm-workspace.yaml + version pin) | 2026-09-02 | 87d8e2a | [260902-cng-fix-railway-pnpm-workspace-build](./quick/260902-cng-fix-railway-pnpm-workspace-build/) |
 | 260903-fao | add GitHub Actions CI (backend pytest+ruff w/ postgres:16 service, frontend vitest+eslint) + clear all lint debt to green | 2026-09-03 | e14c8b7 | [260903-fao-ci-github-actions-backend-pytest-fronten](./quick/260903-fao-ci-github-actions-backend-pytest-fronten/) |
 | 261018-pe4 | fix Google login bouncing back to landing (AuthCallbackPage now awaits /me via login()) | 2026-10-18 | a36d45a | [261018-pe4-fix-google-login-bounce-back-to-landing](./quick/261018-pe4-fix-google-login-bounce-back-to-landing/) |
+| 261018-pyz | fix postcard photo stretched in downloaded image (html2canvas lacks object-fit → pre-crop in onclone) | 2026-10-18 | 9e8cd65 | [261018-pyz-fix-postcard-photo-stretched-in-download](./quick/261018-pyz-fix-postcard-photo-stretched-in-download/) |
 
 ## Human Actions Pending
 
@@ -119,7 +120,7 @@ Next action: `/gsd-complete-milestone v1.0` — archive milestone and prepare ne
 Phase: Milestone v1.0 complete
 Plan: —
 Status: Awaiting next milestone
-Last activity: 2026-10-18 — Completed quick task 261018-pe4: fix Google login bouncing back to landing
+Last activity: 2026-10-18 — Completed quick task 261018-pyz: fix postcard photo stretched in downloaded image
 
 ## Operator Next Steps
 
