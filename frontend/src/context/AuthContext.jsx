@@ -1,14 +1,6 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { AuthContext } from "./auth-context";
-
-const TOKEN_KEY = "ohyes_token";
-const API_URL = import.meta.env.VITE_API_URL || "";
-
-function authHeaders() {
-  const token = localStorage.getItem(TOKEN_KEY);
-  if (!token) return {};
-  return { Authorization: `Bearer ${token}` };
-}
+import { API_URL, TOKEN_KEY, authHeaders, fetchCurrentUser } from "./auth-api";
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
@@ -22,24 +14,29 @@ export function AuthProvider({ children }) {
         return;
       }
 
+      // login() may store a newer token while this check is in flight; its
+      // result then wins, so don't overwrite it with this stale one.
+      const isCurrent = () => localStorage.getItem(TOKEN_KEY) === token;
       try {
-        const res = await fetch(`${API_URL}/api/auth/me`, {
-          headers: authHeaders(),
-        });
-        if (res.ok) {
-          const data = await res.json();
-          setUser(data);
-        } else {
-          localStorage.removeItem(TOKEN_KEY);
-          setUser(null);
-        }
+        const me = await fetchCurrentUser(token);
+        if (isCurrent()) setUser(me);
       } catch {
-        setUser(null);
+        if (isCurrent()) setUser(null);
       } finally {
         setLoading(false);
       }
     }
     checkAuth();
+  }, []);
+
+  // Called by AuthCallbackPage: the provider's mount-time check already ran
+  // (with no token), so the new token must be verified explicitly.
+  const login = useCallback(async (token) => {
+    localStorage.setItem(TOKEN_KEY, token);
+    const me = await fetchCurrentUser(token);
+    setUser(me);
+    setLoading(false);
+    return me;
   }, []);
 
   const logout = async () => {
@@ -55,7 +52,7 @@ export function AuthProvider({ children }) {
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, logout }}>
+    <AuthContext.Provider value={{ user, loading, login, logout }}>
       {children}
     </AuthContext.Provider>
   );
